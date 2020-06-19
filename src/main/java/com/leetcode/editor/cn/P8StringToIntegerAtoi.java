@@ -61,27 +61,127 @@
 
 
 package com.leetcode.editor.cn;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
 //Java：字符串转换整数 (atoi)
-public class P8StringToIntegerAtoi{
+public class P8StringToIntegerAtoi {
     public static void main(String[] args) {
         Solution solution = new P8StringToIntegerAtoi().new Solution();
         // TO TEST
+        System.out.println(solution.myAtoi2("-123132131313132"));
     }
+
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
-        public int myAtoi(String str) {
-            if(str == null || str.length() == 0 || str.trim().length() == 0){
+        //方法1：判断多种边界条件
+        public int myAtoi1(String str) {
+            if (str == null || str.length() == 0 || str.trim().length() == 0) {
                 return 0;
             }
             String afterTrim = str.trim();
-            if(afterTrim.charAt(0) != '-' || afterTrim.charAt(0) != '+' || (afterTrim.charAt(0) < '0') && (afterTrim.charAt(0) > '9')){
+            if (afterTrim.charAt(0) != '-'
+                    && afterTrim.charAt(0) != '+'
+                    && (afterTrim.charAt(0) < '0'
+                    || afterTrim.charAt(0) > '9')) {
                 return 0;
             }
             int result = 0;
-            for (int i = 0; i < str.length(); i++){
+            boolean symbol = true;
+            boolean flag = false;
+            for (int i = 0; i < str.length(); i++) {
 
+                if (i == 0 && afterTrim.charAt(i) == '+') {
+                    symbol = true;
+                    continue;
+                }
+                if (i == 0 && afterTrim.charAt(i) == '-') {
+                    symbol = false;
+                    continue;
+                }
+                if ((i == 0 && afterTrim.charAt(i) == '0')
+                        || (i == 1 && (afterTrim.charAt(0) == '-' || afterTrim.charAt(0) == '+') && afterTrim.charAt(i) == '0')) {
+                    flag = true;
+                    continue;
+                }
+                if (flag && afterTrim.charAt(i) == '0') {
+                    continue;
+                }
+                if (afterTrim.charAt(i) < '0' || afterTrim.charAt(i) > '9') {
+                    break;
+                }
+                flag = false;
+                if ((result > Integer.MAX_VALUE / 10 || (result == Integer.MAX_VALUE / 10 && (afterTrim.charAt(i) - '0') > 7)) && symbol) {
+                    return Integer.MAX_VALUE;
+                }
+                if ((result > Integer.MAX_VALUE / 10 || (result == Integer.MAX_VALUE / 10 && (afterTrim.charAt(i) - '0') > 8)) && !symbol) {
+                    return Integer.MIN_VALUE;
+                }
+                result = result * 10 + (afterTrim.charAt(i) - '0');
             }
-            return 0;
+            return symbol ? result : 0 - result;
+        }
+        //方法二：通过状态机处理
+
+        /**
+         * ''      +/-     number      other
+         * start：  start   signed  i_number      end
+         * signed:  end     end     i_number      end
+         * int:     end     end     i_number      end
+         * end:     end     end     end           end
+         */
+        public int myAtoi2(String str) {
+            if (str == null || str.length() == 0) {
+                return 0;
+            }
+            //初始化状态机
+            HashMap<String, List<String>> stateMap = new HashMap<>();
+            stateMap.put("start", Arrays.asList("start", "signed", "int", "end"));
+            stateMap.put("signed", Arrays.asList("end", "end", "int", "end"));
+            stateMap.put("int", Arrays.asList("end", "end", "int", "end"));
+            stateMap.put("end", Arrays.asList("end", "end", "end", "end"));
+            //定义输入信号
+            Function<Character, Integer> getStateIdx = (input) -> {
+                if (input == ' ') {
+                    return 0;
+                } else if (input == '-' || input == '+') {
+                    return 1;
+                } else if (Character.isDigit(input)) {
+                    return 2;
+                } else {
+                    return 3;
+                }
+            };
+            List<String> curState = stateMap.get("start");
+            int result = 0;
+            boolean signed = true;
+            for (int i = 0; i < str.length(); i++) {
+                Integer idx = getStateIdx.apply(str.charAt(i));
+                if (curState.get(idx) == "start") {
+                    curState = stateMap.get("start");
+                } else if (curState.get(idx) == "signed") {
+                    curState = stateMap.get("signed");
+                    if (str.charAt(i) == '-') {
+                        signed = false;
+                    }
+                } else if (curState.get(idx) == "int") {
+                    curState = stateMap.get("int");
+                    if ((result > Integer.MAX_VALUE / 10 || (result == Integer.MAX_VALUE / 10 && (str.charAt(i) - '0') > 7)) && signed) {
+                        return Integer.MAX_VALUE;
+                    }
+                    if ((result > Integer.MAX_VALUE / 10 || (result == Integer.MAX_VALUE / 10 && (str.charAt(i) - '0') > 8)) && !signed) {
+                        return Integer.MIN_VALUE;
+                    }
+                    result = result * 10 + (str.charAt(i) - '0');
+                } else if (curState.get(idx) == "end") {
+                    curState = stateMap.get("end");
+                }
+            }
+            return signed ? result : 0 - result;
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
