@@ -139,7 +139,7 @@ public class P8StringToIntegerAtoi {
                 return 0;
             }
             //初始化状态机
-            HashMap<String, List<String>> stateMap = new HashMap<>();
+            Map<String, List<String>> stateMap = new HashMap<>();
             stateMap.put("start", Arrays.asList("start", "signed", "int", "end"));
             stateMap.put("signed", Arrays.asList("end", "end", "int", "end"));
             stateMap.put("int", Arrays.asList("end", "end", "int", "end"));
