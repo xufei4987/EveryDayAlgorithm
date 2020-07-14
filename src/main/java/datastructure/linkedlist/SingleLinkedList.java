@@ -1,5 +1,7 @@
 package datastructure.linkedlist;
 
+import java.io.IOException;
+
 public class SingleLinkedList<E>  {
 
     private Node headNode = new Node(null, null);
@@ -53,6 +55,11 @@ public class SingleLinkedList<E>  {
         singleLinkedList.add(hero3);
         singleLinkedList.add(hero4);
         singleLinkedList.showList();
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
