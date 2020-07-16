@@ -3,11 +3,11 @@ package datastructure.stack;
 /**
  * 利用中缀表达式实现一位数的加减乘除运算
  */
-public class SimpleCalculator {
+public class SimpleCalculator1 {
     public static void main(String[] args) {
-        SimpleCalculator simpleCalculator = new SimpleCalculator();
+        SimpleCalculator1 simpleCalculator1 = new SimpleCalculator1();
         String expression = "3+5*3-9";
-        int result = simpleCalculator.cal(expression);
+        int result = simpleCalculator1.cal(expression);
         System.out.println("表达式 " + expression + " 的值为：" + result);
     }
 
