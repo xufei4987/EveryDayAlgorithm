@@ -57,7 +57,7 @@ public class ReversePolishNotation {
             } else if (s1.empty() || s.equals("(")) {
                 s1.push(s);
             } else if (s.equals(")")) {
-                while (!s1.peek().equals("(")){
+                while (!s1.peek().equals("(")) {
                     s2.add(s1.pop());
                 }
                 //弹出括号
@@ -70,7 +70,7 @@ public class ReversePolishNotation {
             }
         }
         //将剩余的符号加入到s2
-        while (!s1.empty()){
+        while (!s1.empty()) {
             s2.add(s1.pop());
         }
         return s2;
@@ -142,10 +142,10 @@ public class ReversePolishNotation {
         int num1;
         int num2;
         Stack<String> stack = new Stack<>();
-        for (String s : notationList){
-            if(s.matches("\\d+")){
+        for (String s : notationList) {
+            if (s.matches("\\d+")) {
                 stack.push(s);
-            }else{
+            } else {
                 num2 = Integer.valueOf(stack.pop());
                 num1 = Integer.valueOf(stack.pop());
                 switch (s) {
