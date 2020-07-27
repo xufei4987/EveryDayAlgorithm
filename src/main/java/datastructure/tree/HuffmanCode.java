@@ -175,7 +175,7 @@ public class HuffmanCode {
             tmp = tmp | 0x100;
         }
         String str = Integer.toBinaryString(tmp);
-        if (flag) {
+        if (flag || tmp < 0) {
             return str.substring(str.length() - 8);
         } else {
             return str;
