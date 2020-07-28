@@ -1,4 +1,4 @@
-package datastructure.map;
+package datastructure.table;
 
 import java.util.Objects;
 

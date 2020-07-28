@@ -1,4 +1,4 @@
-package datastructure.map;
+package datastructure.table;
 
 public class TestHashTable {
     public static void main(String[] args) {

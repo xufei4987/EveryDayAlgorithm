@@ -1,4 +1,4 @@
-package datastructure.map;
+package datastructure.table;
 
 public class Emp {
     private int id;
