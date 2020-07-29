@@ -9,12 +9,37 @@ import java.util.List;
  */
 public class BinarySearch {
     private int count = 0;
+
     public int search0(int[] arr, int val) {
         return search0(arr, 0, arr.length - 1, val);
     }
 
     public List<Integer> search1(int[] arr, int val) {
         return search1(arr, 0, arr.length - 1, val);
+    }
+
+    /**
+     * 非递归方式进行二分查找
+     *
+     * @param arr
+     * @param target
+     * @return 找到返回索引，没找到返回-1
+     */
+    private int search(int[] arr, int target) {
+        int left = 0;
+        int right = arr.length - 1;
+        int mid;
+        while (left <= right) {
+            mid = (left + right) / 2;
+            if (target == arr[mid]) {
+                return mid;
+            } else if (target > arr[mid]) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return -1;
     }
 
     //找到目标值并返回下标
@@ -64,11 +89,11 @@ public class BinarySearch {
 
     public static void main(String[] args) {
         BinarySearch binarySearch = new BinarySearch();
-        int[] arr = {1,8,10,89,1000,2345};
-        int idx = binarySearch.search0(arr, 1);
-        if(idx == -1){
+        int[] arr = {1, 8, 10, 89, 1000, 2345};
+        int idx = binarySearch.search(arr, 1);
+        if (idx == -1) {
             System.out.println("没有在集合中找到该值");
-        }else {
+        } else {
             System.out.println("已在集合中找到该值，在集合中的下标为：" + idx);
         }
 //        int[] arr = {1, 8, 89, 89, 89, 89, 89, 1000, 2345};
