@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * 贪心算法：
  * 每步选取最优的策略，但不一定是全局最优
- * 通过贪心算法解决集合覆盖问题
+ * 通过贪心算法解决集合覆盖问题 
  */
 public class SetCoveringProblem {
     public static void main(String[] args) {
