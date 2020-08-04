@@ -74,18 +74,24 @@ public class KruskalCase {
 
     /**
      * 查询顶点对应的终点的下标
+     *
      * @param ends 各个顶点对应连接的顶点的下标
-     * @param i 需要查询终点的顶点的下标
+     * @param i    需要查询终点的顶点的下标
      * @return
      */
-    private int getEnd(int[] ends, int i){
-        while (ends[i] != 0){
+    private int getEnd(int[] ends, int i) {
+        while (ends[i] != 0) {
             i = ends[i];
         }
         return i;
     }
 
-    public List<EData> kruskal(){
+    /**
+     * n个顶点有n-1条边进行连通，n-1条边满足不构成回路就是最小生成树，这就是kruskal算法的原来。
+     *
+     * @return
+     */
+    public List<EData> kruskal() {
         int[] ends = new int[edgeNum];
         EData[] edges = getEdges();
         List<EData> edgeList = Arrays.asList(edges);
@@ -95,14 +101,13 @@ public class KruskalCase {
             int startIdx = getPosition(edgeList.get(i).start);
             int endIdx = getPosition(edgeList.get(i).end);
             //没有相同的终点 不会构成回路
-            if(getEnd(ends,startIdx) != getEnd(ends,endIdx)){
+            if (getEnd(ends, startIdx) != getEnd(ends, endIdx)) {
                 ends[startIdx] = endIdx; //设置当前顶点连接的另一个顶点
                 res.add(edgeList.get(i));  //加入到最小生成树的结果集合中
             }
         }
         return res;
     }
-
 
 
     private static class EData implements Comparable<EData> {
