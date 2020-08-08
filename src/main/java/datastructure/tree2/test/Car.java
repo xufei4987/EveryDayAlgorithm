@@ -1,4 +1,4 @@
-package datastructure.tree2.bst;
+package datastructure.tree2.test;
 
 public class Car {
     private int fee;
