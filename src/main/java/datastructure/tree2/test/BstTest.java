@@ -1,23 +1,27 @@
-package datastructure.tree2.bst;
+package datastructure.tree2.test;
 
+import datastructure.tree2.bst.BinarySearchTree;
 import datastructure.tree2.printer.BinaryTrees;
 
-public class Main {
+public class BstTest {
     public static void main(String[] args) {
-        Integer[] data = new Integer[]{7, 4, 9, 2, 5, 8, 11, 3, 1};
+        Integer[] data = new Integer[]{7, 4, 9, 2, 5, 8, 11, 3, 1,12};
         BinarySearchTree<Integer> bst1 = new BinarySearchTree<>();
         for (int i = 0; i < data.length; i++) {
             bst1.add(data[i]);
         }
         BinaryTrees.print(bst1);
         System.out.println();
-        System.out.println(bst1.toString());
-        System.out.println(bst1.height());
-        System.out.println(bst1.height2());
-        System.out.println(bst1.isComplete());
-        bst1.inverseTree();
-        System.out.println();
+        bst1.remove(1);
         BinaryTrees.print(bst1);
+
+//        System.out.println(bst1.toString());
+//        System.out.println(bst1.height());
+//        System.out.println(bst1.height2());
+//        System.out.println(bst1.isComplete());
+//        bst1.inverseTree();
+//        System.out.println();
+//        BinaryTrees.print(bst1);
 //        bst1.levelOrder();
 //        System.out.println();
 //        bst1.preorder(new Visitor<Integer>() {
@@ -53,5 +57,4 @@ public class Main {
 
 
     }
-
 }

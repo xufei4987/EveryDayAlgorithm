@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class BinarySearchTree<E> extends BinaryTree<E> {
 
-    private Comparator<E> comparator;//自定义比较器
+    protected Comparator<E> comparator;//自定义比较器
 
     public BinarySearchTree(Comparator comparator) {
         super();
@@ -18,8 +18,9 @@ public class BinarySearchTree<E> extends BinaryTree<E> {
     public void add(E e) {
         elementNotNullCheck(e);
         if (root == null) {
-            root = new Node<>(e, null);
+            root = createNode(e, null);
             size++;
+            afterAdd(root);
             return;
         }
         Node node = root;
@@ -37,13 +38,18 @@ public class BinarySearchTree<E> extends BinaryTree<E> {
                 return; //相同直接返回
             }
         }
-        Node newNode = new Node<>(e, parent);
+        Node newNode = createNode(e, parent);
         if (cmp > 0) {
             parent.right = newNode;
         } else {
             parent.left = newNode;
         }
         size++;
+        afterAdd(newNode);
+    }
+
+    protected void afterAdd(Node node) {
+        //do nothing
     }
 
     /**

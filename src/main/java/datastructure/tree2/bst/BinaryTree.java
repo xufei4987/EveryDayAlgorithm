@@ -22,6 +22,10 @@ public class BinaryTree<E> implements BinaryTreeInfo {
         size = 0;
     }
 
+    protected Node<E> createNode(E element, Node<E> parent){
+        return new Node<>(element,parent);
+    }
+
     /**
      * 查找某个节点的前驱节点
      * 前驱节点的定义：中序遍历，某个节点的前一个节点
@@ -256,7 +260,12 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 
     @Override
     public Object string(Object node) {
-        return ((Node) node).element;
+        Node n = (Node) node;
+        if(n.parent == null){
+            return n.element + "_(null)";
+        } else {
+            return n.element + "_(" + n.parent.element + ")";
+        }
     }
 
     protected static class Node<E> {
@@ -276,6 +285,14 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 
         public boolean hasTwoChildren() {
             return left != null && right != null;
+        }
+
+        public boolean isLeftChild(){
+            return parent != null && this == parent.left;
+        }
+
+        public boolean isRightChild(){
+            return parent != null && this == parent.right;
         }
     }
 }
