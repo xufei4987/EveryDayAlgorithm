@@ -9,12 +9,20 @@ public class AVLTest {
         AVLTree<Integer> avlTree = new AVLTree<>();
         for (int i = 0; i < data.length; i++) {
             avlTree.add(data[i]);
-            BinaryTrees.print(avlTree);
-            System.out.println();
+//            BinaryTrees.print(avlTree);
+//            System.out.println();
+//            System.out.println("-------------------------------------");
         }
-//        System.out.println();
 //        avlTree.add(13);
-//        BinaryTrees.print(avlTree);
+        BinaryTrees.print(avlTree);
+        System.out.println();
+        System.out.println("-------------------------------------");
+        avlTree.remove(67);
+        avlTree.remove(83);
+        avlTree.remove(98);
+        avlTree.remove(2);
+
+        BinaryTrees.print(avlTree);
     }
 
 }

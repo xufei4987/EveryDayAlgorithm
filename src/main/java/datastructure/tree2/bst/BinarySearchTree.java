@@ -48,7 +48,7 @@ public class BinarySearchTree<E> extends BinaryTree<E> {
         afterAdd(newNode);
     }
 
-    protected void afterAdd(Node node) {
+    protected void afterAdd(Node<E> node) {
         //do nothing
     }
 
@@ -95,6 +95,10 @@ public class BinarySearchTree<E> extends BinaryTree<E> {
             }
         }
         size--;
+        afterRemove(p);
+    }
+
+    protected void afterRemove(Node<E> node) {
     }
 
     private Node<E> getNode(E e) {

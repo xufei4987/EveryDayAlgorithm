@@ -262,9 +262,9 @@ public class BinaryTree<E> implements BinaryTreeInfo {
     public Object string(Object node) {
         Node n = (Node) node;
         if(n.parent == null){
-            return n.element + "_(null)";
+            return n.toString() + "_(null)";
         } else {
-            return n.element + "_(" + n.parent.element + ")";
+            return n.toString() + "_(" + n.parent.element + ")";
         }
     }
 
@@ -293,6 +293,16 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 
         public boolean isRightChild(){
             return parent != null && this == parent.right;
+        }
+        //兄弟节点
+        public Node<E> sibling(){
+            if(isRightChild()){
+                return this.parent.left;
+            }
+            if(isLeftChild()){
+                return this.parent.right;
+            }
+            return null;
         }
     }
 }
