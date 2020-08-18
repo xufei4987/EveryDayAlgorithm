@@ -74,31 +74,37 @@ public class BinarySearchTree<E> extends BinaryTree<E> {
             node.element = p.element;
             //需要将前驱节点删除，由于前驱节点的度必为0或者1，所以走下面的删除流程就可以了
         }
+        Node<E> replacement = p.left != null ? p.left : p.right;
         if (p.isLeaf()) {
             if (p.parent == null) {
                 root = null;
+                afterRemove(p, null);
             } else {
                 if (p.parent.left == p) {
                     p.parent.left = null;
                 } else {
                     p.parent.right = null;
                 }
+                afterRemove(p, null);
             }
         } else {
             //待删除节点度为1
             if (p.parent == null) {
                 root = p.left != null ? p.left : p.right;
+                root.parent = null;
             } else if (p.parent.left == p) {
                 p.parent.left = p.left != null ? p.left : p.right;
+                p.parent.left.parent = p.parent;
             } else {
                 p.parent.right = p.left != null ? p.left : p.right;
+                p.parent.right.parent = p.parent;
             }
+            afterRemove(p, replacement);
         }
         size--;
-        afterRemove(p);
     }
 
-    protected void afterRemove(Node<E> node) {
+    protected void afterRemove(Node<E> node, Node<E> replacement) {
     }
 
     private Node<E> getNode(E e) {

@@ -9,6 +9,15 @@ public class RBTTest {
         RBTree<Integer> rbTree = new RBTree<>();
         for (int i = 0; i < data.length; i++) {
             rbTree.add(data[i]);
+//            BinaryTrees.print(rbTree);
+//            System.out.println();
+//            System.out.println("-------------------------------------");
+        }
+        BinaryTrees.print(rbTree);
+        System.out.println();
+        System.out.println("-------------------------------------");
+        for (int i = 0; i < data.length; i++){
+            rbTree.remove(data[i]);
             BinaryTrees.print(rbTree);
             System.out.println();
             System.out.println("-------------------------------------");

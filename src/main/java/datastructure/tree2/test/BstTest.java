@@ -12,7 +12,7 @@ public class BstTest {
         }
         BinaryTrees.print(bst1);
         System.out.println();
-        bst1.remove(1);
+        bst1.remove(11);
         BinaryTrees.print(bst1);
 
 //        System.out.println(bst1.toString());
