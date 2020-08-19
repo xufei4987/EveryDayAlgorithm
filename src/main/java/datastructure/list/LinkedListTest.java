@@ -1,8 +1,8 @@
 package datastructure.list;
 
-public class ArrayListTest {
+public class LinkedListTest {
     public static void main(String[] args) {
-        List<Integer> list = new ArrayList<>();
+        List<Integer> list = new LinkedList<>();
         list.add(1);
         list.add(2);
         list.add(3);

@@ -1,10 +1,9 @@
 package datastructure.list;
 
-public class ArrayList<E> {
+public class ArrayList<E> extends AbstractList<E> {
 
     private static final int DEFAULT_CAPACITY = 8;
 
-    private int size;
     private Object[] elements;
 
     public ArrayList(int capacity) {
@@ -18,26 +17,9 @@ public class ArrayList<E> {
         this(DEFAULT_CAPACITY);
     }
 
-    public int size() {
-        return size;
-    }
-
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    public boolean contains(E element) {
-        return indexOf(element) != -1;
-    }
-
-    public void add(E element) {
-        insert(size, element);
-    }
-
-    public void insert(int index, E element) {
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
-        }
+    @Override
+    public void add(int index, E element) {
+        rangeCheckForAdd(index);
         ensuerCapacity(size + 1);
         for (int i = size - 1; i >= index; i--) {
             elements[i + 1] = elements[i];
@@ -60,26 +42,23 @@ public class ArrayList<E> {
         System.out.println("容量由" + oldCapacity + "扩容为" + elements.length);
     }
 
+    @Override
     public E get(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
-        }
+        rangeCheck(index);
         return (E) elements[index];
     }
 
+    @Override
     public E set(int index, E element) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
-        }
+        rangeCheck(index);
         Object old = elements[index];
         elements[index] = element;
         return (E) old;
     }
 
+    @Override
     public E remove(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
-        }
+        rangeCheck(index);
         E old = (E) elements[index];
         for (int i = index + 1; i < size; i++) {
             elements[i - 1] = elements[i];
@@ -89,6 +68,7 @@ public class ArrayList<E> {
         return old;
     }
 
+    @Override
     public int indexOf(E element) {
         if (element == null) {
             for (int i = 0; i < size; i++) {
@@ -103,9 +83,10 @@ public class ArrayList<E> {
                 }
             }
         }
-        return -1;
+        return ELEMENT_NOT_FOUND;
     }
 
+    @Override
     public void clear() {
         for (int i = 0; i < size; i++) {
             elements[i] = null;
