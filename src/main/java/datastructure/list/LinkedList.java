@@ -73,6 +73,45 @@ public class LinkedList<E> extends AbstractList<E> {
         first = null;
     }
 
+    //反转链表（迭代方式）
+    public void reverse() {
+        if (first == null || first.next == null) return;
+        Node<E> newFirst = null;
+        Node<E> tmp = null;
+        while (first != null){
+            tmp = first.next;
+            first.next = newFirst;
+            newFirst = first;
+            first = tmp;
+        }
+        first = newFirst;
+    }
+    //反转链表（递归方式）
+    public void reverse1(){
+        Node<E> newFirst = reverse1(this.first);
+        this.first = newFirst;
+    }
+    //判断链表是否有环（快慢指针）
+    public boolean hasCircle(){
+        if (first == null || first.next == null) return false;
+        Node<E> slow = first;
+        Node<E> fast = first.next;
+        while (fast != null && fast.next != null){
+            if(slow == fast) return true;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return false;
+    }
+
+    private Node<E> reverse1(Node<E> first) {
+        if (first == null || first.next == null) return first;
+        Node<E> newFirst = reverse1(first.next);
+        first.next.next = first;
+        first.next = null;
+        return newFirst;
+    }
+
     private Node<E> node(int index) {
         rangeCheck(index);
         Node<E> node = first;
@@ -90,7 +129,7 @@ public class LinkedList<E> extends AbstractList<E> {
         while (node != null) {
             sb.append(node.element.toString());
             if (node.next != null) {
-                sb.append("->");
+                sb.append(" -> ");
             }
             node = node.next;
         }

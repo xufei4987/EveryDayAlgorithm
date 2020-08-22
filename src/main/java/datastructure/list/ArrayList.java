@@ -65,7 +65,23 @@ public class ArrayList<E> extends AbstractList<E> {
         }
         size--;
         elements[size] = null;
+        trim();
         return old;
+    }
+
+    //缩容
+    private void trim() {
+        int oldCapacity = elements.length;
+        if (size > (oldCapacity >> 1) || size < DEFAULT_CAPACITY) {
+            return;
+        }
+        //缩容1.5倍
+        Object[] newElements = new Object[oldCapacity - (oldCapacity >> 1)];
+        for (int i = 0; i < size; i++) {
+            newElements[i] = elements[i];
+        }
+        elements = newElements;
+        System.out.println("容量由" + oldCapacity + "缩容为" + elements.length);
     }
 
     @Override
