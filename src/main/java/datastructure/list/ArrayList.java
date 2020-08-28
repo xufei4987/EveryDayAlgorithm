@@ -104,8 +104,12 @@ public class ArrayList<E> extends AbstractList<E> {
 
     @Override
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            elements[i] = null;
+        if(size > DEFAULT_CAPACITY){
+            elements = new Object[DEFAULT_CAPACITY];
+        } else {
+            for (int i = 0; i < size; i++) {
+                elements[i] = null;
+            }
         }
         size = 0;
     }
