@@ -1,0 +1,509 @@
+package datastructure.map;
+
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Queue;
+
+public class HashMap<K,V> implements Map<K,V> {
+    private static final int DEFAULT_CAPACITY = 1 << 4;
+    private static final boolean RED = false;
+    private static final boolean BLACK = true;
+    private int size;
+    private Node<K,V>[] table;
+
+    public HashMap(int capacity){
+        this.table = new Node[capacity];
+    }
+
+    public HashMap(){
+        this(DEFAULT_CAPACITY);
+    }
+
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < table.length; i++) {
+            table[i] = null;
+        }
+        size = 0;
+    }
+
+    @Override
+    public V put(K key, V value) {
+        int index = index(key);
+        Node<K, V> root = table[index];
+        if(root == null){
+            root = createNode(key, value, null);
+            table[index] = root;
+            size++;
+            afterPut(root);
+            return null;
+        }
+
+        Node node = root;
+        Node parent = root;
+        int h1 = key == null ? 0 : key.hashCode();
+        int cmp = 0;
+        while (node != null) {
+            cmp = compare(key, (K) node.k, h1, node.hash);
+            parent = node;
+            if (cmp > 0) {
+                node = node.right;
+            } else if (cmp < 0) {
+                node = node.left;
+            } else {
+                node.k = key;
+                V oldValue = (V) node.v;
+                node.v = value;
+                return oldValue;
+            }
+        }
+        Node newNode = createNode(key, value, parent);
+        if (cmp > 0) {
+            parent.right = newNode;
+        } else {
+            parent.left = newNode;
+        }
+        size++;
+        afterPut(newNode);
+        return null;
+    }
+
+    @Override
+    public V get(K key) {
+        Node<K, V> node = node(key);
+        return node == null ? null : node.v;
+    }
+
+    @Override
+    public V remove(K key) {
+        return remove(node(key));
+    }
+
+    private V remove(Node<K, V> node) {
+        if (node == null) {
+            return null;
+        }
+        V removedNodeValue = node.v;
+        Node<K,V> p = node;
+        if (node.hasTwoChildren()) {
+            p = predecessor(p);
+            node.k = p.k;
+            node.v = p.v;
+            //需要将前驱节点删除，由于前驱节点的度必为0或者1，所以走下面的删除流程就可以了
+        }
+        int index = index(node);
+        Node<K,V> replacement = p.left != null ? p.left : p.right;
+        if (p.isLeaf()) {
+            if (p.parent == null) {
+                table[index] = null;
+                afterRemove(p, null);
+            } else {
+                if (p.parent.left == p) {
+                    p.parent.left = null;
+                } else {
+                    p.parent.right = null;
+                }
+                afterRemove(p, null);
+            }
+        } else {
+            //待删除节点度为1
+            if (p.parent == null) {
+                table[index] = p.left != null ? p.left : p.right;
+                table[index].parent = null;
+            } else if (p.parent.left == p) {
+                p.parent.left = p.left != null ? p.left : p.right;
+                p.parent.left.parent = p.parent;
+            } else {
+                p.parent.right = p.left != null ? p.left : p.right;
+                p.parent.right.parent = p.parent;
+            }
+            afterRemove(p, replacement);
+        }
+        size--;
+        return removedNodeValue;
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        return node(key) != null;
+    }
+
+    @Override
+    public boolean containsValue(V value) {
+        Queue<Node> queue = new LinkedList<>();
+        for (int i = 0; i < table.length; i++) {
+            if(table[i] == null) continue;
+            queue.offer(table[i]);
+            while (!queue.isEmpty()){
+                Node node = queue.poll();
+                if(Objects.equals(node.v,value)) return true;
+                if(node.left != null){
+                    queue.offer(node.left);
+                }
+                if(node.right != null){
+                    queue.offer(node.right);
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void traversal(Visitor<K, V> visitor) {
+        Queue<Node> queue = new LinkedList<>();
+        for (int i = 0; i < table.length; i++) {
+            if(table[i] == null) continue;
+            queue.offer(table[i]);
+            while (!queue.isEmpty()){
+                Node<K,V> node = queue.poll();
+                if (visitor.visit(node.k,node.v)) {
+                    return;
+                }
+                if(node.left != null){
+                    queue.offer(node.left);
+                }
+                if(node.right != null){
+                    queue.offer(node.right);
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据Key计算索引
+     * @param key
+     * @return
+     */
+    private int index(K key){
+        if (key == null) return 0;
+        int hashcode = key.hashCode();
+        return (hashcode ^ (hashcode >>> 16)) & (table.length - 1);
+    }
+
+    private int index(Node<K,V> node){
+        if (node == null) return 0;
+        int hashcode = node.hash;
+        return (hashcode ^ (hashcode >>> 16)) & (table.length - 1);
+    }
+
+    /**
+     * 查找某个节点的前驱节点
+     * 前驱节点的定义：中序遍历，某个节点的前一个节点
+     *
+     * @param node
+     * @return
+     */
+    private Node<K,V> predecessor(Node<K,V> node) {
+        if (node == null) {
+            return null;
+        }
+        //如果有左子树，找左子树中最大的那个节点
+        if (node.left != null) {
+            Node<K,V> p = node.left;
+            while (p.right != null) {
+                p = p.right;
+            }
+            return p;
+        }
+        while (node.parent != null && node.parent.left == node) {
+            node = node.parent;
+        }
+        //node父节点为空，返回null
+        //node的父节点不为空，当前节点是父节点的右子节点，返回父节点
+        return node.parent;
+    }
+
+    private Node<K, V> createNode(K k, V v, Node<K, V> parent) {
+        return new Node<>(k, v, parent);
+    }
+
+    private Node<K,V> node(K key){
+        int index = index(key);
+        Node<K,V> root = table[index];
+        if (root == null) {
+            return null;
+        }
+        Node<K,V> node = root;
+        int h1 = key == null ? 0 : key.hashCode();
+        while (node != null) {
+            int compare = compare(key, node.k, h1, node.hash);
+            if (compare == 0) {
+                return node;
+            } else if (compare > 0) {
+                node = node.right;
+            } else {
+                node = node.left;
+            }
+        }
+        return null;
+    }
+
+    private void afterPut(Node<K, V> node) {
+        Node<K, V> parent = node.parent;
+        //添加的是root节点
+        if (parent == null) {
+            black(node);
+            return;
+        }
+        //1、父节点是黑色的四种情况,不需要进行额外的处理
+        if (isBlack(parent)) {
+            return;
+        }
+
+        Node<K, V> uncle = parent.sibling();
+        Node<K, V> grand = parent.parent;
+        if (isRed(uncle)) { //2、uncle节点是红色的4种情况
+            black(parent);
+            black(uncle);
+            afterPut(red(grand));
+            return;
+        }
+        //3、uncle节点是红色的4种情况
+        if (parent.isLeftChild()) { //L
+            if (node.isLeftChild()) { //LL
+                black(parent);
+                red(grand);
+                rotateRight(grand);
+            } else { //LR
+                black(node);
+                red(grand);
+                rotateLeft(parent);
+                rotateRight(grand);
+            }
+        } else { //R
+            if (node.isLeftChild()) {//RL
+                black(node);
+                red(grand);
+                rotateRight(parent);
+                rotateLeft(grand);
+            } else {//RR
+                black(parent);
+                red(grand);
+                rotateLeft(grand);
+            }
+        }
+    }
+
+    private void afterRemove(Node<K, V> node, Node<K, V> replacement) {
+        //如果删除的为红色叶子节点不用处理
+        if (isRed(node)) return;
+        //删除的是带有一个红色子节点的黑色节点
+        if (isRed(replacement)) {
+            black(replacement);
+            return;
+        }
+        Node<K, V> parent = node.parent;
+        //删除的是根节点
+        if (parent == null) return;
+        /**
+         * 删除的是黑色叶子节点
+         * 1 兄弟节点是黑色
+         *  1.1兄弟节点有至少1个红色子节点 通过旋转借给删除的节点
+         *  1.2兄弟节点没有红色子节点，父节点下溢（需要递归处理）
+         * 2 兄弟节点是红色
+         *  2.1通过旋转，将兄弟节点的儿子变为兄弟，并重复兄弟节点是黑色的处理逻辑
+         */
+        boolean left = parent.left == null || node.isLeftChild(); //需要兼容父节点向下合并的情况
+        Node<K, V> sibling = left ? parent.right : parent.left;
+        if (left) { //被删除的节点在左边，兄弟节点在右边
+            if (isRed(sibling)) { //将兄弟节点是红色的情况转化为兄弟节点是黑色的情况
+                black(sibling);
+                red(parent);
+                rotateLeft(parent);
+                //变更兄弟
+                sibling = parent.right;
+            }
+            if (isBlack(sibling.left) && isBlack(sibling.right)) { //兄弟节点没有红色子节点
+                boolean parentBlack = isBlack(parent);
+                black(parent);
+                red(sibling);
+                if (parentBlack) { //如果父节点为黑色，需要父节点向下合并，再将父节点重复处理
+                    afterRemove(parent, null);
+                }
+            } else { //兄弟节点至少有一个红色子节点
+                if (isBlack(sibling.right)) {
+                    rotateRight(sibling);
+                    sibling = parent.right;
+                }
+                color(sibling, colorOf(parent));
+                black(sibling.right);
+                black(parent);
+                rotateLeft(parent);
+            }
+        } else { //被删除的节点在右边，兄弟节点在左边
+            if (isRed(sibling)) { //将兄弟节点是红色的情况转化为兄弟节点是黑色的情况
+                black(sibling);
+                red(parent);
+                rotateRight(parent);
+                //变更兄弟
+                sibling = parent.left;
+            }
+            if (isBlack(sibling.left) && isBlack(sibling.right)) { //兄弟节点没有红色子节点
+                boolean parentBlack = isBlack(parent);
+                black(parent);
+                red(sibling);
+                if (parentBlack) { //如果父节点为黑色，需要父节点向下合并，再将父节点重复处理
+                    afterRemove(parent, null);
+                }
+            } else { //兄弟节点至少有一个红色子节点
+                if (isBlack(sibling.left)) {
+                    rotateLeft(sibling);
+                    sibling = parent.left;
+                }
+                color(sibling, colorOf(parent));
+                black(sibling.left);
+                black(parent);
+                rotateRight(parent);
+            }
+        }
+    }
+
+    //左旋
+    private void rotateLeft(Node grand) {
+        Node parent = grand.right;
+        Node leftChild = parent.left;
+        grand.right = leftChild;
+        parent.left = grand;
+        afterRotate(grand, parent, leftChild);
+
+    }
+
+    //右旋
+    private void rotateRight(Node grand) {
+        Node parent = grand.left;
+        Node rightChild = parent.right;
+        grand.left = rightChild;
+        parent.right = grand;
+        afterRotate(grand, parent, rightChild);
+    }
+
+    private void afterRotate(Node grand, Node parent, Node child) {
+        //更新parent的parent属性
+        parent.parent = grand.parent;
+        if (grand.isLeftChild()) {
+            grand.parent.left = parent;
+        } else if (grand.isRightChild()) {
+            grand.parent.right = parent;
+        } else {//grand是root节点
+            table[index(grand)] = parent;
+        }
+        //更新grand、leftChild的parent属性
+        if (child != null) {
+            child.parent = grand;
+        }
+        grand.parent = parent;
+    }
+
+    private Node<K, V> color(Node<K, V> node, boolean color) {
+        if (node == null) {
+            return node;
+        }
+        node.color = color;
+        return node;
+    }
+
+    private int compare(K k1, K k2, int h1, int h2) {
+        //先比较hash值
+        int result = h1 - h2;
+        if(result != 0) return result;
+        //比较equals
+        if(Objects.equals(k1,k2)) return 0;
+        //hash值相等，但不相等
+        if(k1 != null && k2 != null){
+            String k1Cls = k1.getClass().getName();
+            String k2Cls = k2.getClass().getName();
+            result = k1Cls.compareTo(k2Cls);
+            if(result != 0) return result;
+            //是同一种类且具备可比较性
+            if(k1 instanceof Comparable){
+                return ((Comparable) k1).compareTo(k2);
+            }
+        }
+        //其余的可能性：
+        //是同一种类且不具备可比较性、k1 == null && k2 != null 、k1 != null && k2 == null
+        //比较内存地址
+        return System.identityHashCode(k1) - System.identityHashCode(k2);
+    }
+
+    private Node<K, V> red(Node<K, V> node) {
+        return color(node, RED);
+    }
+
+    private Node<K, V> black(Node<K, V> node) {
+        return color(node, BLACK);
+    }
+
+    private boolean colorOf(Node<K, V> node) {
+        return node == null ? BLACK : node.color;
+    }
+
+    private boolean isRed(Node<K, V> node) {
+        return colorOf(node) == RED;
+    }
+
+    private boolean isBlack(Node<K, V> node) {
+        return colorOf(node) == BLACK;
+    }
+
+    private static class Node<K, V> {
+        K k;
+        V v;
+        int hash;
+        Node<K, V> left;
+        Node<K, V> right;
+        Node<K, V> parent;
+        //默认为红色，可以更快的满足红黑树的性质
+        boolean color = RED;
+
+        public Node(K k, V v, Node<K, V> parent) {
+            this.k = k;
+            this.v = v;
+            this.parent = parent;
+            this.hash = k == null ? 0 : k.hashCode();
+        }
+
+        public boolean isLeaf() {
+            return left == null && right == null;
+        }
+
+        public boolean hasTwoChildren() {
+            return left != null && right != null;
+        }
+
+        public boolean isLeftChild() {
+            return parent != null && this == parent.left;
+        }
+
+        public boolean isRightChild() {
+            return parent != null && this == parent.right;
+        }
+
+        //兄弟节点
+        public Node<K, V> sibling() {
+            if (isRightChild()) {
+                return this.parent.left;
+            }
+            if (isLeftChild()) {
+                return this.parent.right;
+            }
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            String c = this.color == BLACK ? "b" : "r";
+            return k.toString() + "-" + v.toString() + "(" + c + ")";
+        }
+    }
+}
