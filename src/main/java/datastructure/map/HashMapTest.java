@@ -56,5 +56,14 @@ public class HashMapTest {
             result = 31 * result + (height != null ? height.hashCode() : 0);
             return result;
         }
+
+        @Override
+        public String toString() {
+            return "Person{" +
+                    "name='" + name + '\'' +
+                    ", age=" + age +
+                    ", height=" + height +
+                    '}';
+        }
     }
 }
