@@ -2,6 +2,10 @@ package datastructure.map;
 
 public class HashMapTest {
     public static void main(String[] args) {
+        test2();
+    }
+
+    public static void test1(){
         HashMap<Object, Integer> hashMap = new HashMap<>();
         hashMap.put(new Person("youxu",28,1.80f), 1);
         hashMap.put(new Person("youxu",28,1.80f), 2);
@@ -17,6 +21,20 @@ public class HashMapTest {
 //        hashMap.remove(new Person("youxu",28,1.80f));
 //        hashMap.remove("aaa");
 //        System.out.println(hashMap.size());
+        hashMap.traversal(new Map.Visitor<Object, Integer>() {
+            @Override
+            boolean visit(Object key, Integer value) {
+                System.out.println(key + "---" + value.toString());
+                return false;
+            }
+        });
+    }
+
+    public static void test2(){
+        HashMap<Object, Integer> hashMap = new HashMap<>();
+        for (int i = 0; i < 100; i++) {
+            hashMap.put(new Person("youxu" + i,i+10,1.80f + i*1.0f/100), i);
+        }
         hashMap.traversal(new Map.Visitor<Object, Integer>() {
             @Override
             boolean visit(Object key, Integer value) {

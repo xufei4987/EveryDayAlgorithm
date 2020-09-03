@@ -10,6 +10,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private static final boolean BLACK = true;
     private int size;
     private Node<K, V>[] table;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     public HashMap(int capacity) {
         this.table = new Node[capacity];
@@ -40,6 +41,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
     @Override
     public V put(K key, V value) {
+        resize();
         int index = index(key);
         Node<K, V> root = table[index];
         if (root == null) {
@@ -208,6 +210,86 @@ public class HashMap<K, V> implements Map<K, V> {
                 }
             }
         }
+    }
+
+    /**
+     * 扩容
+     */
+    private void resize(){
+        //装填因子：节点个数/桶的大小
+        if(size / table.length <= DEFAULT_LOAD_FACTOR) return;
+        Node<K,V>[] oldTable = table;
+        table = new Node[table.length << 1];
+        Queue<Node> queue = new LinkedList<>();
+        for (int i = 0; i < oldTable.length; i++) {
+            if (oldTable[i] == null) continue;
+            queue.offer(oldTable[i]);
+            while (!queue.isEmpty()) {
+                Node<K, V> node = queue.poll();
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+                moveNode(node);
+            }
+        }
+    }
+
+    private void moveNode(Node<K, V> newNode) {
+        //重置node
+        resetNode(newNode);
+        //移动到扩容后的table上
+        int index = index(newNode.k);
+        if (table[index] == null) {
+            table[index] = newNode;
+            afterPut(newNode);
+            return;
+        }
+
+        Node<K, V> node = table[index];
+        Node<K, V> parent = table[index];
+        K k1 = newNode.k;
+        int h1 = k1 == null ? 0 : k1.hashCode();
+        int cmp = 0;
+        while (node != null) {
+            parent = node;
+            K k2 = node.k;
+            int h2 = node.hash;
+            if (h1 > h2) {
+                cmp = 1;
+            } else if (h1 < h2) {
+                cmp = -1;
+            }  else if (k1 != null && k2 != null
+                    && k1.getClass() == k2.getClass()
+                    && k1 instanceof Comparable
+                    && (cmp = ((Comparable) k1).compareTo(k2)) != 0) {
+                //do nothing
+            } else {
+                cmp = System.identityHashCode(k1) - System.identityHashCode(k2);
+            }
+
+            if (cmp > 0) {
+                node = node.right;
+            } else if (cmp < 0) {
+                node = node.left;
+            }
+        }
+        if (cmp > 0) {
+            parent.right = newNode;
+        } else {
+            parent.left = newNode;
+        }
+        newNode.parent = parent;
+        afterPut(newNode);
+    }
+
+    private void resetNode(Node<K, V> node) {
+        node.left = null;
+        node.right = null;
+        node.parent = null;
+        node.color = RED;
     }
 
     /**
