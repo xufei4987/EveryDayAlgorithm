@@ -23,7 +23,7 @@ public class HashMapTest {
 //        System.out.println(hashMap.size());
         hashMap.traversal(new Map.Visitor<Object, Integer>() {
             @Override
-            boolean visit(Object key, Integer value) {
+            public boolean visit(Object key, Integer value) {
                 System.out.println(key + "---" + value.toString());
                 return false;
             }
@@ -37,14 +37,14 @@ public class HashMapTest {
         }
         hashMap.traversal(new Map.Visitor<Object, Integer>() {
             @Override
-            boolean visit(Object key, Integer value) {
+            public boolean visit(Object key, Integer value) {
                 System.out.println(key + "---" + value.toString());
                 return false;
             }
         });
     }
 
-    private static class Person{
+    public static class Person{
         String name;
         Integer age;
         Float height;

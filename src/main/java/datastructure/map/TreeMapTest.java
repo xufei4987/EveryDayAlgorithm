@@ -9,7 +9,7 @@ public class TreeMapTest {
         treeMap.put(2,"hahddda");
         treeMap.traversal(new Map.Visitor<Integer, String>() {
             @Override
-            boolean visit(Integer key, String value) {
+            public boolean visit(Integer key, String value) {
                 System.out.println(key.toString() + "-" + value.toString());
                 return true;
             }
