@@ -5,9 +5,7 @@ import datastructure.tree2.printer.BinaryTreeInfo;
 import java.util.Comparator;
 
 public class BinaryHeap<E> extends AbstractHeap<E> implements BinaryTreeInfo {
-    private int size;
     private Object[] elements;
-    private Comparator<E> comparator;
     private static final int DEFAULT_CAPACITY = 10;
 
     public BinaryHeap(Object[] elements, Comparator<E> comparator){
