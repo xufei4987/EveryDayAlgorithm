@@ -10,13 +10,32 @@ public class BinaryHeap<E> extends AbstractHeap<E> implements BinaryTreeInfo {
     private Comparator<E> comparator;
     private static final int DEFAULT_CAPACITY = 10;
 
-    public BinaryHeap(Comparator<E> comparator) {
+    public BinaryHeap(Object[] elements, Comparator<E> comparator){
         super(comparator);
-        this.elements = new Object[DEFAULT_CAPACITY];
+        if(elements == null || elements.length == 0){
+            this.elements = new Object[DEFAULT_CAPACITY];
+        } else {
+            size = elements.length;
+            this.elements = new Object[Math.max(DEFAULT_CAPACITY,elements.length)];
+            for (int i = 0; i < elements.length; i++) {
+                this.elements[i] = elements[i];
+            }
+            //自下而上的下滤
+            for (int i = (size >> 1) - 1; i >= 0; i--){
+                siftDown(i);
+            }
+        }
+    }
+    public BinaryHeap(Object[] elements) {
+        this(elements,null);
+    }
+
+    public BinaryHeap(Comparator<E> comparator) {
+        this(null,comparator);
     }
 
     public BinaryHeap() {
-        this(null);
+        this(null,null);
     }
 
 
