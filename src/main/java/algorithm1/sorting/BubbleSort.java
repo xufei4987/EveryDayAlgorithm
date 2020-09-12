@@ -1,6 +1,6 @@
 package algorithm1.sorting;
 
-public class BubbleSort extends Sort {
+public class BubbleSort<E extends Comparable<E>> extends Sort<E> {
     @Override
     protected void sort() {
         for (int end = array.length - 1; end > 0; end--) {
