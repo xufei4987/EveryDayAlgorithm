@@ -4,15 +4,17 @@ import java.util.Arrays;
 
 public class SortTest {
     public static void main(String[] args) {
-        Integer[] arr = IntergerUtils.random(15000, 1, 1000000);
+        Integer[] arr = IntergerUtils.random(50000, 1, 100000);
         testSort(arr,
-                new BubbleSort(),
-                new SelectionSort(),
+//                new BubbleSort(),
+//                new SelectionSort(),
                 new HeapSort(),
-                new InsertionSort1(),
-                new InsertionSort2(),
-                new InsertionSort3(),
-                new MergeSort());
+//                new InsertionSort1(),
+//                new InsertionSort2(),
+//                new InsertionSort3(),
+                new MergeSort(),
+                new QuickSort(),
+                new ShellSort());
     }
 
     public static void testSort(Integer[] arr, Sort... sort){
