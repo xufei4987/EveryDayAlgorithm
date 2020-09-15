@@ -6,15 +6,17 @@ public class SortTest {
     public static void main(String[] args) {
         Integer[] arr = IntergerUtils.random(50000, 1, 100000);
         testSort(arr,
-//                new BubbleSort(),
-//                new SelectionSort(),
+                new BubbleSort(),
+                new SelectionSort(),
                 new HeapSort(),
-//                new InsertionSort1(),
-//                new InsertionSort2(),
-//                new InsertionSort3(),
+                new InsertionSort1(),
+                new InsertionSort2(),
+                new InsertionSort3(),
                 new MergeSort(),
                 new QuickSort(),
-                new ShellSort());
+                new ShellSort(),
+                new CountingSort(),
+                new RadixSort());
     }
 
     public static void testSort(Integer[] arr, Sort... sort){
