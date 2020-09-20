@@ -5,9 +5,9 @@ import java.util.*;
 public class ListGraph<V, E> implements Graph<V, E> {
 
     private Map<V, Vertex<V, E>> vertices = new HashMap<>();
-    private Set<Edge<V,E>> edges = new HashSet<>();
+    private Set<Edge<V, E>> edges = new HashSet<>();
 
-    public void print(){
+    public void print() {
         edges.forEach(System.out::println);
     }
 
@@ -37,17 +37,17 @@ public class ListGraph<V, E> implements Graph<V, E> {
         Vertex<V, E> fromVertex = vertices.get(from);
         if (fromVertex == null) {
             fromVertex = new Vertex<>(from);
-            vertices.put(from,fromVertex);
+            vertices.put(from, fromVertex);
         }
         Vertex<V, E> toVertex = vertices.get(to);
         if (toVertex == null) {
             toVertex = new Vertex<>(to);
-            vertices.put(to,toVertex);
+            vertices.put(to, toVertex);
         }
 
         Edge<V, E> edge = new Edge<>(fromVertex, toVertex, wight);
         //删除 再添加 就是更新
-        if(fromVertex.outEdges.remove(edge)){
+        if (fromVertex.outEdges.remove(edge)) {
             toVertex.inEdges.remove(edge);
             edges.remove(edge);
         }
@@ -63,7 +63,7 @@ public class ListGraph<V, E> implements Graph<V, E> {
         //删除指向该顶点的边
         Iterator<Edge<V, E>> inEdgeIterator = vertex.inEdges.iterator();
         //利用迭代器进行删除
-        while (inEdgeIterator.hasNext()){
+        while (inEdgeIterator.hasNext()) {
             Edge<V, E> nextInEdge = inEdgeIterator.next();
             nextInEdge.from.outEdges.remove(nextInEdge);
             inEdgeIterator.remove();
@@ -72,7 +72,7 @@ public class ListGraph<V, E> implements Graph<V, E> {
         //删除从该顶点出去的边
         Iterator<Edge<V, E>> outEdgeIterator = vertex.outEdges.iterator();
         //利用迭代器进行删除
-        while (outEdgeIterator.hasNext()){
+        while (outEdgeIterator.hasNext()) {
             Edge<V, E> nextOutEdge = outEdgeIterator.next();
             nextOutEdge.to.inEdges.remove(nextOutEdge);
             outEdgeIterator.remove();
@@ -88,9 +88,77 @@ public class ListGraph<V, E> implements Graph<V, E> {
         if (toVertex == null) return;
         Edge<V, E> edge = new Edge<>(fromVertex, toVertex);
         //if this set contained the specified element return true
-        if (fromVertex.outEdges.remove(edge)){
+        if (fromVertex.outEdges.remove(edge)) {
             toVertex.inEdges.remove(edge);
             edges.remove(edge);
+        }
+    }
+
+    @Override
+    public void bfs(V begin) {
+        Vertex<V, E> beginVertex = vertices.get(begin);
+        if (beginVertex == null) return;
+        HashSet<Vertex<V, E>> visitedVertexs = new HashSet<>();
+        LinkedList<Vertex<V, E>> queue = new LinkedList<>();
+        queue.offer(beginVertex);
+        //添加到队列中就视为已访问
+        visitedVertexs.add(beginVertex);
+        while (!queue.isEmpty()) {
+            Vertex<V, E> vertex = queue.poll();
+            System.out.println(vertex.value);
+            Set<Edge<V, E>> outEdges = vertex.outEdges;
+            for (Edge<V, E> outEdge : outEdges) {
+                if (visitedVertexs.contains(outEdge.to)) {
+                    continue;
+                }
+                queue.offer(outEdge.to);
+                //添加到队列中就视为已访问
+                visitedVertexs.add(outEdge.to);
+            }
+        }
+    }
+
+    @Override
+    public void dfs(V begin) {
+        Vertex<V, E> beginVertex = vertices.get(begin);
+        if (beginVertex == null) return;
+        HashSet<Vertex<V, E>> visitedVertexs = new HashSet<>();
+        dfs(beginVertex, visitedVertexs);
+    }
+
+    private void dfs(Vertex<V, E> vertex, HashSet<Vertex<V, E>> visitedVertexs) {
+        visitedVertexs.add(vertex);
+        System.out.println(vertex.value);
+        for (Edge<V, E> outEdge : vertex.outEdges) {
+            if (visitedVertexs.contains(outEdge.to)) {
+                return;
+            }
+            dfs(outEdge.to, visitedVertexs);
+        }
+    }
+
+    @Override
+    public void dfsWithoutRecursion(V begin) {
+        Vertex<V, E> beginVertex = vertices.get(begin);
+        if (beginVertex == null) return;
+        Stack<Vertex<V, E>> stack = new Stack<>();
+        Set<Vertex<V, E>> visitedVertices = new HashSet<>();
+        //处理第一个节点
+        stack.push(beginVertex);
+        System.out.println(beginVertex.value);
+        visitedVertices.add(beginVertex);
+        //处理后续的节点
+        while (!stack.isEmpty()) {
+            Vertex<V, E> vertex = stack.pop();
+            for (Edge<V, E> edge : vertex.outEdges) {
+                if (visitedVertices.contains(edge.to)) continue;
+                System.out.println(edge.to.value);
+                visitedVertices.add(edge.to);
+                stack.push(edge.from);
+                stack.push(edge.to);
+                //处理完一条分支后需要跳出循环
+                break;
+            }
         }
     }
 
@@ -132,7 +200,7 @@ public class ListGraph<V, E> implements Graph<V, E> {
         E weight;
 
         public Edge(Vertex<V, E> from, Vertex<V, E> to) {
-            this(from,to,null);
+            this(from, to, null);
         }
 
         public Edge(Vertex<V, E> from, Vertex<V, E> to, E weight) {

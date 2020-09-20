@@ -46,4 +46,19 @@ public interface Graph<V, E> {
      * @param to
      */
     void removeEdge(V from, V to);
+
+    /**
+     * 广度优先遍历
+     */
+    void bfs(V begin);
+
+    /**
+     * 深度优先遍历
+     */
+    void dfs(V begin);
+
+    /**
+     * 深度优先遍历(非递归)
+     */
+    void dfsWithoutRecursion(V begin);
 }
