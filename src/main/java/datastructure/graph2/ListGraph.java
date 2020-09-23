@@ -1,11 +1,19 @@
 package datastructure.graph2;
 
+import datastructure.union.GenericUnionFind;
+import datastructure.union.UnionFind;
+
 import java.util.*;
 
-public class ListGraph<V, E> implements Graph<V, E> {
+public class ListGraph<V, E> extends Graph<V, E> {
 
     private Map<V, Vertex<V, E>> vertices = new HashMap<>();
     private Set<Edge<V, E>> edges = new HashSet<>();
+    private Comparator<Edge<V, E>> edgeComparator = (e1,e2) -> weightManager.compare(e1.weight,e2.weight);
+
+    public ListGraph(WeightManager<E> weightManager) {
+        super(weightManager);
+    }
 
     public void print() {
         edges.forEach(System.out::println);
@@ -95,7 +103,7 @@ public class ListGraph<V, E> implements Graph<V, E> {
     }
 
     @Override
-    public void bfs(V begin) {
+    public void bfs(V begin, Visitor<V> visitor) {
         Vertex<V, E> beginVertex = vertices.get(begin);
         if (beginVertex == null) return;
         HashSet<Vertex<V, E>> visitedVertexs = new HashSet<>();
@@ -105,7 +113,7 @@ public class ListGraph<V, E> implements Graph<V, E> {
         visitedVertexs.add(beginVertex);
         while (!queue.isEmpty()) {
             Vertex<V, E> vertex = queue.poll();
-            System.out.println(vertex.value);
+            visitor.visit(vertex.value);
             Set<Edge<V, E>> outEdges = vertex.outEdges;
             for (Edge<V, E> outEdge : outEdges) {
                 if (visitedVertexs.contains(outEdge.to)) {
@@ -119,40 +127,40 @@ public class ListGraph<V, E> implements Graph<V, E> {
     }
 
     @Override
-    public void dfs(V begin) {
+    public void dfs(V begin, Visitor<V> visitor) {
         Vertex<V, E> beginVertex = vertices.get(begin);
         if (beginVertex == null) return;
         HashSet<Vertex<V, E>> visitedVertexs = new HashSet<>();
-        dfs(beginVertex, visitedVertexs);
+        dfs(beginVertex, visitedVertexs, visitor);
     }
 
-    private void dfs(Vertex<V, E> vertex, HashSet<Vertex<V, E>> visitedVertexs) {
+    private void dfs(Vertex<V, E> vertex, HashSet<Vertex<V, E>> visitedVertexs, Visitor<V> visitor) {
         visitedVertexs.add(vertex);
-        System.out.println(vertex.value);
+        visitor.visit(vertex.value);
         for (Edge<V, E> outEdge : vertex.outEdges) {
             if (visitedVertexs.contains(outEdge.to)) {
                 return;
             }
-            dfs(outEdge.to, visitedVertexs);
+            dfs(outEdge.to, visitedVertexs, visitor);
         }
     }
 
     @Override
-    public void dfsWithoutRecursion(V begin) {
+    public void dfsWithoutRecursion(V begin, Visitor<V> visitor) {
         Vertex<V, E> beginVertex = vertices.get(begin);
         if (beginVertex == null) return;
         Stack<Vertex<V, E>> stack = new Stack<>();
         Set<Vertex<V, E>> visitedVertices = new HashSet<>();
         //处理第一个节点
         stack.push(beginVertex);
-        System.out.println(beginVertex.value);
+        visitor.visit(beginVertex.value);
         visitedVertices.add(beginVertex);
         //处理后续的节点
         while (!stack.isEmpty()) {
             Vertex<V, E> vertex = stack.pop();
             for (Edge<V, E> edge : vertex.outEdges) {
                 if (visitedVertices.contains(edge.to)) continue;
-                System.out.println(edge.to.value);
+                visitor.visit(edge.to.value);
                 visitedVertices.add(edge.to);
                 stack.push(edge.from);
                 stack.push(edge.to);
@@ -160,6 +168,100 @@ public class ListGraph<V, E> implements Graph<V, E> {
                 break;
             }
         }
+    }
+
+    @Override
+    public List<V> topologicSort() {
+        //顶点和入度的对应关系
+        HashMap<Vertex<V, E>, Integer> inDegrees = new HashMap<>();
+        //存放入度为0的顶点
+        Queue<Vertex<V, E>> queue = new LinkedList<>();
+        //存放拓扑排序的值
+        List<V> list = new ArrayList<>();
+        //初始化inDegrees
+        vertices.values().forEach(vertex -> {
+            if (vertex.inEdges.size() == 0) {
+                queue.offer(vertex);
+            } else {
+                inDegrees.put(vertex, vertex.inEdges.size());
+            }
+        });
+        while (!queue.isEmpty()) {
+            Vertex<V, E> vertex = queue.poll();
+            list.add(vertex.value);
+            for (Edge<V, E> outEdge : vertex.outEdges) {
+                Integer inDegree = inDegrees.get(outEdge.to);
+                inDegree--;
+                if (inDegree == 0) {
+                    queue.add(outEdge.to);
+                } else {
+                    inDegrees.put(outEdge.to, inDegree);
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Set<EdgeInfo<V, E>> mst() {
+//        return prim();
+        return kruskal();
+    }
+
+    /**
+     * 利用prim算法得到最小生成树
+     * 利用切分定理
+     *
+     * @return
+     */
+    private Set<EdgeInfo<V, E>> prim() {
+        Iterator<Vertex<V, E>> it = vertices.values().iterator();
+        if (!it.hasNext()) {
+            return Collections.emptySet();
+        }
+        //存放最小生成树的边
+        Set<EdgeInfo<V, E>> edgeInfos = new HashSet<>();
+        //随机获取有个顶点
+        Vertex<V, E> vertex = it.next();
+        //利用小顶堆来获取最小的边
+        PriorityQueue<Edge<V, E>> heap = new PriorityQueue<>(edgeComparator);
+        HashSet<Vertex<V, E>> addedVertices = new HashSet<>();
+        vertex.outEdges.forEach(edge -> heap.offer(edge));
+        addedVertices.add(vertex);
+        while (!heap.isEmpty() && addedVertices.size() < this.vertices.size()){
+            Edge<V, E> edge = heap.poll();
+            //过滤重复处理的边
+            if(addedVertices.contains(edge.to)) continue;
+            edgeInfos.add(edge.info());
+            //将最小边连接顶点的所有边加入到heap中，需要过滤当前的edge，可以在下一次循环时处理
+            edge.to.outEdges.forEach(e -> heap.offer(e));
+            addedVertices.add(edge.to);
+        }
+        return edgeInfos;
+    }
+
+    /**
+     * 利用kruskal算法得到最小生成树
+     *  将边按权值进行排序，依次选出最小边，当从第三条边开始，就要判断是否形成了环，需要对形成环的边进行过滤
+     *  是否形成了环可以用并查集来进行判断
+     * @return
+     */
+    private Set<EdgeInfo<V, E>> kruskal() {
+        //初始化并查集
+        GenericUnionFind<Vertex<V, E>> uf = new GenericUnionFind<>();
+        vertices.values().forEach(vertex -> uf.makeSet(vertex));
+        //存放最小生成树的边
+        Set<EdgeInfo<V, E>> edgeInfos = new HashSet<>();
+        PriorityQueue<Edge<V, E>> heap = new PriorityQueue<>(edgeComparator);
+        edges.forEach(e -> heap.add(e));
+        while (!heap.isEmpty() && edgeInfos.size() < vertices.size() - 1){
+            Edge<V, E> edge = heap.poll();
+            //属于同一个集合  说明形成环了
+            if(uf.isSame(edge.from,edge.to)) continue;
+            edgeInfos.add(edge.info());
+            uf.union(edge.from, edge.to);
+        }
+        return edgeInfos;
     }
 
     private static class Vertex<V, E> {
@@ -207,6 +309,10 @@ public class ListGraph<V, E> implements Graph<V, E> {
             this.from = from;
             this.to = to;
             this.weight = weight;
+        }
+
+        public EdgeInfo<V,E> info(){
+            return new EdgeInfo<>(from.value,to.value,weight);
         }
 
         @Override
