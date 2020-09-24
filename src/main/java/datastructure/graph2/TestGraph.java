@@ -1,6 +1,7 @@
 package datastructure.graph2;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TestGraph {
@@ -19,7 +20,8 @@ public class TestGraph {
 //        test1();
 //        test2();
 //        testTopologicSort();
-        testMst();
+//        testMst();
+        testShortestPath();
     }
 
     private static void test1(){
@@ -108,5 +110,18 @@ public class TestGraph {
         graph.addEdge("7","5",5);
         Set<Graph.EdgeInfo<String, Integer>> mst = graph.mst();
         mst.forEach(System.out::println);
+    }
+
+    private static void testShortestPath(){
+        ListGraph<String, Integer> graph = new ListGraph<>(weightManager);
+        graph.addEdge("A","B",10);
+        graph.addEdge("A","D",30);
+        graph.addEdge("A","E",100);
+        graph.addEdge("B","C",50);
+        graph.addEdge("C","E",10);
+        graph.addEdge("D","C",20);
+        graph.addEdge("D","E",60);
+        Map<String, Graph.PathInfo<String,Integer>> map = graph.shortestPath("A");
+        map.entrySet().forEach(System.out::println);
     }
 }

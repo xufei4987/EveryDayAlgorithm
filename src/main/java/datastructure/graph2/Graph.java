@@ -1,6 +1,8 @@
 package datastructure.graph2;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Graph<V, E> {
@@ -82,6 +84,8 @@ public abstract class Graph<V, E> {
      */
     public abstract Set<EdgeInfo<V,E>> mst();
 
+    public abstract Map<V,PathInfo<V,E>> shortestPath(V v);
+
     public interface Visitor<V>{
         void visit(V v);
     }
@@ -89,6 +93,42 @@ public abstract class Graph<V, E> {
     public interface WeightManager<E>{
         int compare(E w1, E w2);
         E add(E w1, E w2);
+    }
+
+    public static class PathInfo<V,E>{
+        protected E weight;
+        protected List<EdgeInfo<V,E>> edgeInfos = new LinkedList<>();
+        public PathInfo(E weight){
+            this.weight = weight;
+        }
+        public PathInfo(E weight, EdgeInfo<V, E> edgeInfo) {
+            this.weight = weight;
+            this.edgeInfos.add(edgeInfo);
+        }
+
+        public E getWeight() {
+            return weight;
+        }
+
+        public void setWeight(E weight) {
+            this.weight = weight;
+        }
+
+        public List<EdgeInfo<V, E>> getEdgeInfos() {
+            return edgeInfos;
+        }
+
+        public void setEdgeInfos(List<EdgeInfo<V, E>> edgeInfos) {
+            this.edgeInfos = edgeInfos;
+        }
+
+        @Override
+        public String toString() {
+            return "PathInfo{" +
+                    "weight=" + weight +
+                    ", edgeInfos=" + edgeInfos +
+                    '}';
+        }
     }
 
     public static class EdgeInfo<V,E>{

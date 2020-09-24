@@ -9,7 +9,7 @@ public class ListGraph<V, E> extends Graph<V, E> {
 
     private Map<V, Vertex<V, E>> vertices = new HashMap<>();
     private Set<Edge<V, E>> edges = new HashSet<>();
-    private Comparator<Edge<V, E>> edgeComparator = (e1,e2) -> weightManager.compare(e1.weight,e2.weight);
+    private Comparator<Edge<V, E>> edgeComparator = (e1, e2) -> weightManager.compare(e1.weight, e2.weight);
 
     public ListGraph(WeightManager<E> weightManager) {
         super(weightManager);
@@ -228,10 +228,10 @@ public class ListGraph<V, E> extends Graph<V, E> {
         HashSet<Vertex<V, E>> addedVertices = new HashSet<>();
         vertex.outEdges.forEach(edge -> heap.offer(edge));
         addedVertices.add(vertex);
-        while (!heap.isEmpty() && addedVertices.size() < this.vertices.size()){
+        while (!heap.isEmpty() && addedVertices.size() < this.vertices.size()) {
             Edge<V, E> edge = heap.poll();
             //过滤重复处理的边
-            if(addedVertices.contains(edge.to)) continue;
+            if (addedVertices.contains(edge.to)) continue;
             edgeInfos.add(edge.info());
             //将最小边连接顶点的所有边加入到heap中，需要过滤当前的edge，可以在下一次循环时处理
             edge.to.outEdges.forEach(e -> heap.offer(e));
@@ -242,8 +242,9 @@ public class ListGraph<V, E> extends Graph<V, E> {
 
     /**
      * 利用kruskal算法得到最小生成树
-     *  将边按权值进行排序，依次选出最小边，当从第三条边开始，就要判断是否形成了环，需要对形成环的边进行过滤
-     *  是否形成了环可以用并查集来进行判断
+     * 将边按权值进行排序，依次选出最小边，当从第三条边开始，就要判断是否形成了环，需要对形成环的边进行过滤
+     * 是否形成了环可以用并查集来进行判断
+     *
      * @return
      */
     private Set<EdgeInfo<V, E>> kruskal() {
@@ -254,15 +255,142 @@ public class ListGraph<V, E> extends Graph<V, E> {
         Set<EdgeInfo<V, E>> edgeInfos = new HashSet<>();
         PriorityQueue<Edge<V, E>> heap = new PriorityQueue<>(edgeComparator);
         edges.forEach(e -> heap.add(e));
-        while (!heap.isEmpty() && edgeInfos.size() < vertices.size() - 1){
+        while (!heap.isEmpty() && edgeInfos.size() < vertices.size() - 1) {
             Edge<V, E> edge = heap.poll();
             //属于同一个集合  说明形成环了
-            if(uf.isSame(edge.from,edge.to)) continue;
+            if (uf.isSame(edge.from, edge.to)) continue;
             edgeInfos.add(edge.info());
             uf.union(edge.from, edge.to);
         }
         return edgeInfos;
     }
+
+
+    @Override
+    public Map<V, PathInfo<V, E>> shortestPath(V v) {
+        return dijsktra(v);
+    }
+
+    /**
+     * dijsktra算法求最短路径(不能有负权值的边)
+     * 核心概念：松弛操作更新最短路径的值
+     *
+     * @param v
+     * @return
+     */
+    private Map<V, PathInfo<V, E>> dijsktra(V v) {
+        Vertex<V, E> beginVertex = vertices.get(v);
+        if (beginVertex == null) return Collections.emptyMap();
+        //顶点v到各个顶点目前的最短距离（中间状态）
+        Map<Vertex<V, E>, PathInfo<V, E>> paths = new HashMap<>();
+        //顶点v到各个顶点确定的最短距离
+        Map<V, PathInfo<V, E>> selectedPaths = new HashMap<>();
+        //初始化paths
+        beginVertex.outEdges.forEach(edge -> paths.put(edge.to, new PathInfo<V, E>(edge.weight, edge.info())));
+        while (!paths.isEmpty()) {
+            //找出最距离
+            Map.Entry<Vertex<V, E>, PathInfo<V, E>> minEntry = getShortestPath(paths);
+            Vertex<V, E> minVertex = minEntry.getKey();
+            PathInfo<V, E> minPath = minEntry.getValue();
+            //最短距离加入到selectedPaths中，并在paths中移除
+            selectedPaths.put(minVertex.value, minPath);
+            paths.remove(minVertex);
+            //对minVertex的outEdges进行松弛操作(更新paths的最短距离)
+            for (Edge<V, E> edge : minVertex.outEdges) {
+                //已经确定的最短路径的顶点需要过滤
+                if (selectedPaths.containsKey(edge.to.value)) continue;
+                relax(edge,minPath,paths);
+            }
+        }
+        selectedPaths.remove(beginVertex);//无向图需要移除beginVertex
+        return selectedPaths;
+    }
+
+    /**
+     * 找出最短的边（可以用小顶堆进行优化）
+     * @param paths
+     * @return
+     */
+    private Map.Entry<Vertex<V, E>, PathInfo<V, E>> getShortestPath(Map<Vertex<V, E>, PathInfo<V, E>> paths) {
+        Iterator<Map.Entry<Vertex<V, E>, PathInfo<V, E>>> iterator = paths.entrySet().iterator();
+        Map.Entry<Vertex<V, E>, PathInfo<V, E>> minEntry = iterator.next();
+        while (iterator.hasNext()) {
+            Map.Entry<Vertex<V, E>, PathInfo<V, E>> entry = iterator.next();
+            if (weightManager.compare(entry.getValue().weight, minEntry.getValue().weight) < 0) {
+                minEntry = entry;
+            }
+        }
+        return minEntry;
+    }
+
+    /**
+     * 松弛操作
+     * @param edge 松弛的边
+     * @param fromPath edge的from顶点的最短路径信息
+     * @param paths 顶点v到各个顶点目前的最短距离（中间状态）
+     */
+    private void relax(Edge<V, E> edge, PathInfo<V, E> fromPath, Map<Vertex<V, E>, PathInfo<V, E>> paths) {
+        E newWight = weightManager.add(fromPath.weight, edge.weight);
+        PathInfo<V, E> oldPath = paths.get(edge.to);
+        if (oldPath != null && weightManager.compare(newWight, oldPath.weight) >= 0) return;
+        if (oldPath == null) {
+            oldPath = new PathInfo<>(newWight);
+            paths.put(edge.to, oldPath);
+        } else {
+            oldPath.edgeInfos.clear();
+            oldPath.weight = newWight;
+        }
+        oldPath.edgeInfos.addAll(fromPath.edgeInfos);
+        oldPath.edgeInfos.add(edge.info());
+    }
+
+    /**
+     * 获取顶点V到各个顶点的最短路径
+     *
+     * @Override public Map<V, E> shortestPath(V v) {
+     * Vertex<V, E> beginVertex = vertices.get(v);
+     * if (beginVertex == null) return Collections.emptyMap();
+     * //顶点v到各个顶点目前的最短距离（中间状态）
+     * HashMap<Vertex<V, E>, E> paths = new HashMap<>();
+     * //顶点v到各个顶点确定的最短距离
+     * HashMap<V, E> selectedPaths = new HashMap<>();
+     * //初始化paths
+     * beginVertex.outEdges.forEach(edge -> paths.put(edge.to, edge.weight));
+     * while (!paths.isEmpty()) {
+     * //找出最距离
+     * Map.Entry<Vertex<V, E>, E> minEntry = getShortestPath(paths);
+     * Vertex<V, E> minVertex = minEntry.getKey();
+     * //最短距离加入到selectedPaths中，并在paths中移除
+     * selectedPaths.put(minVertex.value, minEntry.getValue());
+     * paths.remove(minVertex);
+     * //对minVertex的outEdges进行松弛操作(更新paths的最短距离)
+     * for (Edge<V, E> edge : minVertex.outEdges) {
+     * //已经确定的最短路径的顶点需要过滤
+     * if(selectedPaths.containsKey(edge.to.value)) continue;
+     * E newWight = weightManager.add(minEntry.getValue(), edge.weight);
+     * E oldWight = paths.get(edge.to);
+     * if (oldWight == null || weightManager.compare(newWight, oldWight) < 0) {
+     * paths.put(edge.to, newWight);
+     * }
+     * }
+     * }
+     * selectedPaths.remove(beginVertex);//无向图需要移除beginVertex
+     * return selectedPaths;
+     * }
+     * <p>
+     * private Map.Entry<Vertex<V, E>, E> getShortestPath(HashMap<Vertex<V, E>, E> paths) {
+     * Iterator<Map.Entry<Vertex<V, E>, E>> iterator = paths.entrySet().iterator();
+     * Map.Entry<Vertex<V, E>, E> minEntry = iterator.next();
+     * while (iterator.hasNext()) {
+     * Map.Entry<Vertex<V, E>, E> entry = iterator.next();
+     * if (weightManager.compare(entry.getValue(), minEntry.getValue()) < 0) {
+     * minEntry = entry;
+     * }
+     * }
+     * return minEntry;
+     * }
+     */
+
 
     private static class Vertex<V, E> {
         V value;
@@ -311,8 +439,8 @@ public class ListGraph<V, E> extends Graph<V, E> {
             this.weight = weight;
         }
 
-        public EdgeInfo<V,E> info(){
-            return new EdgeInfo<>(from.value,to.value,weight);
+        public EdgeInfo<V, E> info() {
+            return new EdgeInfo<>(from.value, to.value, weight);
         }
 
         @Override
