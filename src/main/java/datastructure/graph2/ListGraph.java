@@ -268,7 +268,54 @@ public class ListGraph<V, E> extends Graph<V, E> {
 
     @Override
     public Map<V, PathInfo<V, E>> shortestPath(V v) {
-        return dijsktra(v);
+        return bellmanFord(v);
+    }
+
+    /**
+     * bellmanFord算法求最短路径(可以有负权值的边)
+     * 核心概念：松弛操作更新最短路径的值
+     * 对每一条边进行顶点数量-1次松弛操作
+     * @param v
+     * @return
+     */
+    private Map<V, PathInfo<V, E>> bellmanFord(V v){
+        Vertex<V, E> beginVertex = vertices.get(v);
+        if (beginVertex == null) return Collections.emptyMap();
+        //顶点v到各个顶点确定的最短距离
+        Map<V, PathInfo<V, E>> selectedPaths = new HashMap<>();
+        PathInfo<V, E> beginPath = new PathInfo(weightManager.zero());
+        selectedPaths.put(v,beginPath);
+        int count = vertices.size() - 1;
+        //每条边都进行v-1次松弛
+        for (int i = 0; i < count; i++) {
+            for (Edge<V,E> edge : edges){
+                PathInfo<V, E> fromPath = selectedPaths.get(edge.from.value);
+                if(fromPath == null) continue;
+                relaxForBellmanFord(edge,fromPath,selectedPaths);
+            }
+        }
+        selectedPaths.remove(v);
+        return selectedPaths;
+    }
+    /**
+     * 松弛操作
+     * @param edge 松弛的边
+     * @param fromPath edge的from顶点的最短路径信息
+     * @param paths 顶点v到各个顶点目前的最短距离（中间状态）
+     */
+    private void relaxForBellmanFord(Edge<V, E> edge, PathInfo<V, E> fromPath, Map<V, PathInfo<V, E>> paths) {
+        E newWight = weightManager.add(fromPath.weight, edge.weight);
+        PathInfo<V, E> oldPath = paths.get(edge.to.value);
+        if (oldPath != null && weightManager.compare(newWight, oldPath.weight) >= 0) return;
+        if (oldPath == null) {
+            oldPath = new PathInfo<>(newWight);
+            paths.put(edge.to.value, oldPath);
+        } else {
+            oldPath.edgeInfos.clear();
+            oldPath.weight = newWight;
+        }
+        oldPath.edgeInfos.addAll(fromPath.edgeInfos);
+        oldPath.edgeInfos.add(edge.info());
     }
 
     /**

@@ -15,6 +15,11 @@ public class TestGraph {
         public Integer add(Integer w1, Integer w2) {
             return w1 + w2;
         }
+
+        @Override
+        public Integer zero() {
+            return 0;
+        }
     };
     public static void main(String[] args) {
 //        test1();
