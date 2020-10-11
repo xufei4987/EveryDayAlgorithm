@@ -26,7 +26,8 @@ public class TestGraph {
 //        test2();
 //        testTopologicSort();
 //        testMst();
-        testShortestPath();
+//        testShortestPath();
+        testMultiShortestPath();
     }
 
     private static void test1(){
@@ -128,5 +129,21 @@ public class TestGraph {
         graph.addEdge("D","E",60);
         Map<String, Graph.PathInfo<String,Integer>> map = graph.shortestPath("A");
         map.entrySet().forEach(System.out::println);
+    }
+
+    private static void testMultiShortestPath(){
+        ListGraph<String, Integer> graph = new ListGraph<>(weightManager);
+        graph.addEdge("A","B",10);
+        graph.addEdge("A","D",30);
+        graph.addEdge("A","E",100);
+        graph.addEdge("B","C",50);
+        graph.addEdge("C","E",10);
+        graph.addEdge("D","C",20);
+        graph.addEdge("D","E",60);
+        Map<String, Map<String, Graph.PathInfo<String, Integer>>> map = graph.shortestPath();
+        map.forEach((key,value) -> {
+            System.out.println("======" + key + "======");
+            value.entrySet().forEach(System.out::println);
+        });
     }
 }

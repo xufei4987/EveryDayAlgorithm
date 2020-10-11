@@ -86,6 +86,8 @@ public abstract class Graph<V, E> {
 
     public abstract Map<V,PathInfo<V,E>> shortestPath(V v);
 
+    public abstract Map<V,Map<V,PathInfo<V,E>>> shortestPath();
+
     public interface Visitor<V>{
         void visit(V v);
     }

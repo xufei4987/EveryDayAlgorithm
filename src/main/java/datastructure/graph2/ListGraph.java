@@ -3,6 +3,7 @@ package datastructure.graph2;
 import datastructure.union.GenericUnionFind;
 import datastructure.union.UnionFind;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 public class ListGraph<V, E> extends Graph<V, E> {
@@ -269,6 +270,61 @@ public class ListGraph<V, E> extends Graph<V, E> {
     @Override
     public Map<V, PathInfo<V, E>> shortestPath(V v) {
         return bellmanFord(v);
+    }
+
+    @Override
+    public Map<V, Map<V, PathInfo<V, E>>> shortestPath() {
+        return floyd();
+    }
+    /**
+     * floyd算法求各个顶点间的最短路径(可以有负权值的边)
+     * if dist(v1,v2) + dist(v2,v3) < dist(v1,v3)
+     * then dist(v1,v3) = dist(v1,v2) + dist(v2,v3)
+     * @return
+     */
+    private Map<V, Map<V, PathInfo<V, E>>> floyd() {
+        Map<V, Map<V, PathInfo<V, E>>> paths = new HashMap<>();
+        //初始化paths
+        for(Edge<V,E> edge : edges){
+            Map<V, PathInfo<V, E>> map = paths.get(edge.from.value);
+            if(map == null){
+                map = new HashMap<>();
+                paths.put(edge.from.value,map);
+            }
+            PathInfo<V, E> pathInfo = new PathInfo<>(edge.weight);
+            pathInfo.edgeInfos.add(edge.info());
+            map.put(edge.to.value,pathInfo);
+        }
+        vertices.forEach((v2,vertex2) -> {
+            vertices.forEach((v1,vertex1) -> {
+                vertices.forEach((v3,vertex3) -> {
+                    if(v1.equals(v2) || v2.equals(v3) || v1.equals(v3)) return;
+
+                    PathInfo<V,E> path12 = getPathInfo(v1,v2,paths);
+                    if(path12 == null) return;
+
+                    PathInfo<V,E> path23 = getPathInfo(v2,v3,paths);
+                    if(path23 == null) return;
+
+                    PathInfo<V,E> path13 = getPathInfo(v1,v3,paths);
+                    E newWeight = weightManager.add(path12.weight, path23.weight);
+                    if(path13 != null && weightManager.compare(newWeight,path13.weight) >= 0) return;
+                    if(path13 == null){
+                        path13 = new PathInfo<>(newWeight);
+                        paths.get(v1).put(v3,path13);
+                    } else {
+                        path13.edgeInfos.clear();
+                    }
+                    path13.edgeInfos.addAll(path12.getEdgeInfos());
+                    path13.edgeInfos.addAll(path23.getEdgeInfos());
+                });
+            });
+        });
+        return paths;
+    }
+
+    private PathInfo<V, E> getPathInfo(V v1, V v2, Map<V, Map<V, PathInfo<V, E>>> paths){
+        return paths.get(v1) == null ? null : paths.get(v1).get(v2);
     }
 
     /**
