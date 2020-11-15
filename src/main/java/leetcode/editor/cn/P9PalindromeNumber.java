@@ -26,7 +26,7 @@
 // Related Topics 数学
 
 
-package com.leetcode.editor.cn;
+package leetcode.editor.cn;
 //Java：回文数
 public class P9PalindromeNumber{
     public static void main(String[] args) {

@@ -60,7 +60,7 @@
 // Related Topics 数学 字符串
 
 
-package com.leetcode.editor.cn;
+package leetcode.editor.cn;
 
 import java.util.Arrays;
 import java.util.HashMap;

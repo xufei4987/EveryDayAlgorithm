@@ -22,7 +22,7 @@
 //则中位数是 (2 + 3)/2 = 2.5
 //
 // Related Topics 数组 二分查找 分治算法
-package com.leetcode.editor.cn;
+package leetcode.editor.cn;
 
 public class P4MedianOfTwoSortedArrays {
     public static void main(String[] args) {

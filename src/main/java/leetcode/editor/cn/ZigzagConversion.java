@@ -31,7 +31,7 @@
 //T     S     G 
 // Related Topics 字符串
 
-package com.leetcode.editor.cn;
+package leetcode.editor.cn;
 
 import java.util.ArrayList;
 import java.util.List;

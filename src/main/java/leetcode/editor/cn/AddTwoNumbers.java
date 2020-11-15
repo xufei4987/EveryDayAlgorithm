@@ -12,7 +12,7 @@
 // 
 // Related Topics 链表 数学
 
-package com.leetcode.editor.cn;
+package leetcode.editor.cn;
 
 public class AddTwoNumbers {
     public static void main(String[] args) {
