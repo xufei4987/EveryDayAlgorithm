@@ -69,7 +69,7 @@ public class P24SwapNodesInPairs{
 
     class Solution {
         public ListNode swapPairs(ListNode head) {
-
+            return null;
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
