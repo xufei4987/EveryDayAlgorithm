@@ -44,7 +44,7 @@ public class P24SwapNodesInPairs{
         // TO TEST
         ListNode l1 = new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, null))));
 
-        System.out.println(solution.swapPairs(l1));
+        System.out.println(solution.swapPairs2(l1));
     }
     //leetcode submit region begin(Prohibit modification and deletion)
 
@@ -68,8 +68,30 @@ public class P24SwapNodesInPairs{
     }
 
     class Solution {
-        public ListNode swapPairs(ListNode head) {
-            return null;
+        public ListNode swapPairs1(ListNode head) {
+            if(head == null) return null;
+            if(head.next == null) return head;
+            ListNode newHead = head.next;
+            head.next = swapPairs1(newHead.next);
+            newHead.next = head;
+            return newHead;
+        }
+
+        public ListNode swapPairs2(ListNode head) {
+            if(head == null) return null;
+            if(head.next == null) return head;
+            ListNode dumyHead = new ListNode(0);
+            dumyHead.next = head;
+            ListNode tmpNode = dumyHead;
+            while (tmpNode.next != null && tmpNode.next.next != null){
+                ListNode n1 = tmpNode.next;
+                ListNode n2 = tmpNode.next.next;
+                tmpNode.next = n2;
+                n1.next = n2.next;
+                n2.next = n1;
+                tmpNode = n1;
+            }
+            return dumyHead.next;
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)

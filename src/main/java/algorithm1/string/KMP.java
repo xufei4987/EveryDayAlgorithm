@@ -2,7 +2,7 @@ package algorithm1.string;
 
 public class KMP {
     public static void main(String[] args) {
-
+        System.out.println(indexOf("abcefgabcdabc","abcdabc"));
     }
 
     public static int indexOf(String text, String pattern) {
@@ -14,7 +14,7 @@ public class KMP {
         int pi = 0;
         int ti = 0;
         int tiMax = texts.length - patterns.length;
-        int[] next = next(pattern)
+        int[] next = next(pattern);
         while (pi < patterns.length && ti - pi <= tiMax) {
             if (pi < 0 || texts[ti] == patterns[pi]) {
                 ti++;
@@ -27,6 +27,20 @@ public class KMP {
     }
 
     private static int[] next(String pattern) {
-        return null;
+        int plen = pattern.length();
+        int[] next = new int[plen + 1];
+        next[0] = -1;
+        int i = 0;
+        int n = -1;
+        while (i < plen) {
+            if (n < 0 || pattern.charAt(n) == pattern.charAt(i)) {
+                n++;
+                i++;
+                next[i] = n;
+            } else {
+                n = next[n];
+            }
+        }
+        return next;
     }
 }
