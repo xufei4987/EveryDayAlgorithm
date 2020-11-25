@@ -17,7 +17,40 @@ public class P739DailyTemperatures {
     }
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
+        /**
+         * 倒推法求解
+         * @param T
+         * @return
+         */
         public int[] dailyTemperatures(int[] T) {
+            if(T == null || T.length == 0) return null;
+            int[] ans = new int[T.length];
+            for (int i = T.length - 2; i >= 0; i--){
+                int j = i+1;
+                while (j < T.length){
+                    if (T[i] < T[j]){
+                        ans[i] = j - i;
+                        break;
+                    } else if(ans[j] == 0){
+                        ans[i] = 0;
+                        break;
+                    } else if(T[i] == T[j]){
+                        ans[i] = ans[j] + j - i;
+                        break;
+                    } else {
+                        j = j + ans[j];
+                    }
+                }
+            }
+            return ans;
+        }
+
+        /**
+         * 单调栈求解
+         * @param T
+         * @return
+         */
+        public int[] dailyTemperatures1(int[] T) {
             Stack<Integer> stack = new Stack<>();
             int[] rightMax = new int[T.length];//存储节点右边第一个比他大值索引
             //初始化
