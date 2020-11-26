@@ -14,9 +14,9 @@
 
 package leetcode.editor.cn;
 
-public class AddTwoNumbers {
+public class P2AddTwoNumbers {
     public static void main(String[] args) {
-        Solution solution = new AddTwoNumbers().new Solution();
+        Solution solution = new P2AddTwoNumbers().new Solution();
         ListNode l11 = new ListNode(1);
         ListNode l12 = new ListNode(0);
         ListNode l13 = new ListNode(3);

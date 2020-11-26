@@ -68,8 +68,8 @@ public class P572SubtreeOfAnotherTree {
 
     class Solution {
         public boolean isSubtree(TreeNode s, TreeNode t) {
-            StringBuilder sb1 = new StringBuilder("!");
-            StringBuilder sb2 = new StringBuilder("!");
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
             postOrder(s,sb1);
             postOrder(t,sb2);
             if (sb1.toString().contains(sb2.toString())){
@@ -79,7 +79,6 @@ public class P572SubtreeOfAnotherTree {
         }
 
         private void postOrder(TreeNode s, StringBuilder sb) {
-            sb.append(s.val).append("!");
             if (s.left != null){
                 postOrder(s.left,sb);
             } else {
@@ -90,6 +89,7 @@ public class P572SubtreeOfAnotherTree {
             } else {
                 sb.append("#!");
             }
+            sb.append(s.val).append("!");
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)

@@ -14,9 +14,9 @@ package leetcode.editor.cn;
 
 import java.util.Arrays;
 
-public class SubSortLcci {
+public class MST1616_SubSortLcci {
     public static void main(String[] args) {
-        Solution solution = new SubSortLcci().new Solution();
+        Solution solution = new MST1616_SubSortLcci().new Solution();
         int[] ints = {1, 2, 4, 7, 10, 11, 7, 12, 6, 7, 16, 18, 19};
         System.out.println(Arrays.toString(solution.subSort(ints)));
     }

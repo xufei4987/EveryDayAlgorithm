@@ -29,9 +29,9 @@
 // Related Topics 字符串
 
 package leetcode.editor.cn;
-public class StringRotationLcci {
+public class MST0109_StringRotationLcci {
     public static void main(String[] args) {
-        Solution solution = new StringRotationLcci().new Solution();
+        Solution solution = new MST0109_StringRotationLcci().new Solution();
     }
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
