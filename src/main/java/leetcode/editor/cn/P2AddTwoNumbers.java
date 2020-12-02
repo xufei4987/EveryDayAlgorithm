@@ -1,22 +1,22 @@
-//给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。 
+//给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
 //
-// 如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。 
+// 如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
 //
-// 您可以假设除了数字 0 之外，这两个数都不会以 0 开头。 
+// 您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
 //
-// 示例： 
+// 示例：
 //
 // 输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
 //输出：7 -> 0 -> 8
 //原因：342 + 465 = 807
-// 
+//
 // Related Topics 链表 数学
 
 package leetcode.editor.cn;
 
-public class AddTwoNumbers {
+public class P2AddTwoNumbers {
     public static void main(String[] args) {
-        Solution solution = new AddTwoNumbers().new Solution();
+        Solution solution = new P2AddTwoNumbers().new Solution();
         ListNode l11 = new ListNode(1);
         ListNode l12 = new ListNode(0);
         ListNode l13 = new ListNode(3);
@@ -47,7 +47,7 @@ public class AddTwoNumbers {
      * }
      */
     class Solution {
-        public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        public ListNode addTwoNumbers1(ListNode l1, ListNode l2) {
             ListNode dummyHead = new ListNode(0);
             ListNode n1 = l1, n2 = l2, cur = dummyHead;
             //carry进位需要带入下一次运算
@@ -64,6 +64,34 @@ public class AddTwoNumbers {
             //最后一次进位需要加上
             if (carry > 0) {
                 cur.next = new ListNode(carry);
+            }
+            return dummyHead.next;
+        }
+
+        public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+            if (l1 == null) return l2;
+            if (l2 == null) return l1;
+            ListNode dummyHead = new ListNode(0);
+            ListNode tail = dummyHead;
+            int carry = 0;
+            while (l1 != null || l2 != null){
+                int v1 = 0;
+                if(l1 != null){
+                    v1 = l1.val;
+                    l1 = l1.next;
+                }
+                int v2 = 0;
+                if(l2 != null){
+                    v2 = l2.val;
+                    l2 = l2.next;
+                }
+                int sum = v1 + v2 + carry;
+                carry = sum / 10;
+                tail.next = new ListNode(sum % 10);
+                tail = tail.next;
+            }
+            if (carry > 0) {
+                tail.next = new ListNode(carry);
             }
             return dummyHead.next;
         }
