@@ -22,8 +22,8 @@ public class BinaryTree<E> implements BinaryTreeInfo {
         size = 0;
     }
 
-    protected Node<E> createNode(E element, Node<E> parent){
-        return new Node<>(element,parent);
+    protected Node<E> createNode(E element, Node<E> parent) {
+        return new Node<>(element, parent);
     }
 
     /**
@@ -118,6 +118,38 @@ public class BinaryTree<E> implements BinaryTreeInfo {
         inorder(node.left);
         System.out.println(node.element);
         inorder(node.right);
+    }
+
+    /**
+     * 利用morris思想进行中序遍历 空间复杂度O(1)
+     */
+    public void inorderByMorris() {
+        if (root == null) {
+            return;
+        }
+        Node node = root;
+        while (node != null) {
+            if (node.left != null) {
+                //找到node前驱节点
+                Node pred = node.left;
+                while (pred.right != null && pred.right != node) {
+                    pred = pred.right;
+                }
+                if (pred.right == null) {
+                    //使node前驱节点的right指向node
+                    pred.right = node;
+                    node = node.left;
+                } else { //表明pred.right == node
+                    System.out.print(node.element + " ");
+                    node = node.right;
+                    pred.right = null;
+                }
+
+            } else {
+                System.out.print(node.element + " ");
+                node = node.right;
+            }
+        }
     }
 
     public void postorder() {
@@ -261,7 +293,7 @@ public class BinaryTree<E> implements BinaryTreeInfo {
     @Override
     public Object string(Object node) {
         Node n = (Node) node;
-        if(n.parent == null){
+        if (n.parent == null) {
             return n.toString() + "_(null)";
         } else {
             return n.toString() + "_(" + n.parent.element + ")";
@@ -287,19 +319,20 @@ public class BinaryTree<E> implements BinaryTreeInfo {
             return left != null && right != null;
         }
 
-        public boolean isLeftChild(){
+        public boolean isLeftChild() {
             return parent != null && this == parent.left;
         }
 
-        public boolean isRightChild(){
+        public boolean isRightChild() {
             return parent != null && this == parent.right;
         }
+
         //兄弟节点
-        public Node<E> sibling(){
-            if(isRightChild()){
+        public Node<E> sibling() {
+            if (isRightChild()) {
                 return this.parent.left;
             }
-            if(isLeftChild()){
+            if (isLeftChild()) {
                 return this.parent.right;
             }
             return null;

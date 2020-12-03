@@ -12,7 +12,8 @@ public class BstTest {
         }
         BinaryTrees.print(bst1);
         System.out.println();
-        bst1.remove(11);
+        bst1.inorderByMorris();
+        System.out.println();
         BinaryTrees.print(bst1);
 
 //        System.out.println(bst1.toString());
