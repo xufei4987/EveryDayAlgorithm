@@ -16,16 +16,38 @@
 
 package leetcode.editor.cn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class P46Permutations {
     public static void main(String[] args) {
         Solution solution = new P46Permutations().new Solution();
+        System.out.println(solution.permute(new int[]{1, 2, 3}));
     }
+
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public List<List<Integer>> permute(int[] nums) {
-            return null;
+            if (nums == null) return null;
+            List<List<Integer>> result = new ArrayList<>();
+            if (nums.length == 0) return result;
+            List<Integer> ints = new ArrayList<>();
+            dfs(0, nums, ints, result);
+
+            return result;
+        }
+
+        private void dfs(int idx, int[] nums, List<Integer> ints, List<List<Integer>> result) {
+            if (nums.length == idx) {
+                result.add(new ArrayList<>(ints));
+                return;
+            }
+            for (int i = 0; i < nums.length; i++) {
+                if (ints.contains(nums[i])) continue;
+                ints.add(nums[i]);
+                dfs(idx+1,nums,ints,result);
+                ints.remove(Integer.valueOf(nums[i]));
+            }
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)

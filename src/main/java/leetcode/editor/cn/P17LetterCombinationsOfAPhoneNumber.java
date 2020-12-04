@@ -16,16 +16,58 @@
 
 package leetcode.editor.cn;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class P17LetterCombinationsOfAPhoneNumber {
     public static void main(String[] args) {
         Solution solution = new P17LetterCombinationsOfAPhoneNumber().new Solution();
+        System.out.println(solution.letterCombinations("23"));
     }
+
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
+        Map<Character, String> phoneMap = new HashMap<Character, String>() {{
+            put('2', "abc");
+            put('3', "def");
+            put('4', "ghi");
+            put('5', "jkl");
+            put('6', "mno");
+            put('7', "pqrs");
+            put('8', "tuv");
+            put('9', "wxyz");
+        }};
+
         public List<String> letterCombinations(String digits) {
-            return null;
+            if (digits == null) return null;
+            List<String> strings = new ArrayList<>();
+            char[] numbers = digits.toCharArray();
+            if (numbers.length == 0) return strings;
+            char[] cs = new char[numbers.length];
+            dfs(0, numbers, cs, strings);
+            return strings;
+        }
+
+        /**
+         * 深度优先遍历
+         *
+         * @param idx     遍历的层数
+         * @param numbers 输入的数字字符数组
+         * @param cs      保存字符的变量
+         * @param strings 结果集
+         */
+        private void dfs(int idx, char[] numbers, char[] cs, List<String> strings) {
+            if (idx == numbers.length) {
+                strings.add(new String(cs));
+                return;
+            }
+            String s = phoneMap.get(numbers[idx]);
+            for (int i = 0; i < s.length(); i++) {
+                cs[idx] = s.charAt(i);
+                dfs(idx + 1, numbers, cs, strings);
+            }
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
