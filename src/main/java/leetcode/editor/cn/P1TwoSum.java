@@ -37,15 +37,14 @@ public class P1TwoSum {
         }
         //hash解法
         public int[] twoSum2(int[] nums, int target) {
-            Map<Integer,Integer> map = new HashMap();
+            if (nums == null) return null;
+            HashMap<Integer, Integer> map = new HashMap<>();
             for (int i = 0; i < nums.length; i++) {
-                map.put(nums[i],i);
-            }
-            for (int j = 0; j < nums.length; j++) {
-                int result = target - nums[j];
-                if(map.containsKey(result) && map.get(result) != j){
-                    return new int[]{j,map.get(result)};
+                Integer idx = map.get(target - nums[i]);
+                if (idx != null){
+                    return new int[]{idx,i};
                 }
+                map.put(nums[i],i);
             }
             return null;
         }

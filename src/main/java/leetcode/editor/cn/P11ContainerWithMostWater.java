@@ -19,14 +19,15 @@ package leetcode.editor.cn;
 // Related Topics 数组 双指针
 
 //Java：盛最多水的容器
-public class P11ContainerWithMostWater{
+public class P11ContainerWithMostWater {
     public static void main(String[] args) {
         Solution solution = new P11ContainerWithMostWater().new Solution();
         // TO TEST
-        int[] arr = new int[]{1,8,6,2,5,4,8,3,7};
-        int maxArea = solution.maxArea(arr);
+        int[] arr = new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7};
+        int maxArea = solution.maxArea1(arr);
         System.out.println(maxArea);
     }
+
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int maxArea(int[] height) {
@@ -41,18 +42,43 @@ public class P11ContainerWithMostWater{
 //                }
 //            }
 //            return max;
-            if(height == null || height.length < 2) return 0;
-            int max = 0, cur = 0, l = 0, r = height.length-1;
-            while (l < r){
-                cur = (r - l) * Math.min(height[l],height[r]);
-                if(cur > max) max = cur;
-                if(height[l] > height[r]){
+            if (height == null || height.length < 2) return 0;
+            int max = 0, cur = 0, l = 0, r = height.length - 1;
+            while (l < r) {
+                cur = (r - l) * Math.min(height[l], height[r]);
+                if (cur > max) max = cur;
+                if (height[l] > height[r]) {
                     r--;
                 } else {
                     l++;
                 }
             }
             return max;
+        }
+
+        public int maxArea1(int[] height) {
+            if (height == null || height.length < 2) return 0;
+            int l = 0;
+            int r = height.length - 1;
+            int maxArea = 0;
+            while (l < r) {
+                int minH = Math.min(height[l],height[r]);
+                maxArea = Math.max(maxArea,(r-l)*minH);
+                if(height[l] < height[r]){
+                    int minl = height[l];
+                    l++;
+                    while (l < r && height[l] <= minl){
+                        l++;
+                    }
+                }else {
+                    int minr = height[r];
+                    r--;
+                    while (l < r && height[r] <= minr){
+                        r--;
+                    }
+                }
+            }
+            return maxArea;
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)

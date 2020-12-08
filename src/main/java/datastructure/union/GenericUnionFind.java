@@ -10,7 +10,9 @@ import java.util.Objects;
  * @param <V>
  */
 public class GenericUnionFind<V> {
-
+    /**
+     * 所属集合的父节点
+     */
     private Map<V, Node<V>> nodes = new HashMap<>();
 
     public void makeSet(V v) {

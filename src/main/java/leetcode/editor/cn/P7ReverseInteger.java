@@ -30,29 +30,30 @@ import java.util.Stack;
 public class P7ReverseInteger {
     public static void main(String[] args) {
         Solution solution = new P7ReverseInteger().new Solution();
-        System.out.println(solution.reverse2(1463847412));
+        System.out.println(solution.reverse3(123456789));
     }
+
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
         public int reverse1(int x) {
             String s = String.valueOf(x);
             Stack<Character> stack = new Stack<>();
-            for (char c : s.toCharArray()){
+            for (char c : s.toCharArray()) {
                 stack.push(c);
             }
             Character character = null;
             StringBuilder sb = new StringBuilder();
-            if(x < 0){
+            if (x < 0) {
                 sb.append("-");
             }
             do {
                 character = stack.pop();
-                if(character >= '0' && character <= '9'){
+                if (character >= '0' && character <= '9') {
                     sb.append(character);
                 }
-            }while (!stack.empty());
+            } while (!stack.empty());
             String reverseStr = sb.toString();
-            if(Long.valueOf(reverseStr) > Integer.MAX_VALUE || Long.valueOf(reverseStr) < Integer.MIN_VALUE){
+            if (Long.valueOf(reverseStr) > Integer.MAX_VALUE || Long.valueOf(reverseStr) < Integer.MIN_VALUE) {
                 return 0;
             }
             return Integer.valueOf(reverseStr);
@@ -64,18 +65,32 @@ public class P7ReverseInteger {
          */
         public int reverse2(int x) {
             int reverse = 0;
-            while (x != 0){
+            while (x != 0) {
                 int pop = x % 10;
-                x = x/10;
-                if(reverse > Integer.MAX_VALUE/10 || (reverse == Integer.MAX_VALUE/10 && pop > 7)){
+                x = x / 10;
+                if (reverse > Integer.MAX_VALUE / 10 || (reverse == Integer.MAX_VALUE / 10 && pop > 7)) {
                     return 0;
                 }
-                if(reverse < Integer.MIN_VALUE/10 || (reverse == Integer.MAX_VALUE/10 && pop < -8)){
+                if (reverse < Integer.MIN_VALUE / 10 || (reverse == Integer.MAX_VALUE / 10 && pop < -8)) {
                     return 0;
                 }
                 reverse = reverse * 10 + pop;
             }
             return reverse;
+        }
+
+        /**
+         * 以溢出后的结果无法进行回推 来判断是否溢出
+         */
+        public int reverse3(int x) {
+            int res = 0;
+            while (x != 0) {
+                int prevRes = res;
+                res = res * 10 + x % 10;
+                if ((res - x % 10) / 10 != prevRes) return 0;
+                x = x / 10;
+            }
+            return res;
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
