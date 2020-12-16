@@ -21,11 +21,33 @@ public class P53MaximumSubarray {
         Solution solution = new P53MaximumSubarray().new Solution();
         // TO TEST
         int[] arr = {-2,1,-3,4,-1,2,1,-5,4};
-        System.out.println(solution.maxSubArray(arr));
+        System.out.println(solution.maxSubArray1(arr));
     }
 
     //leetcode submit region begin(Prohibit modification and deletion)
     class Solution {
+        /**
+         * dp
+         * @param nums
+         * @return
+         */
+        public int maxSubArray1(int[] nums) {
+            if (nums.length == 1) return nums[0];
+            int[] dp = new int[nums.length];
+            dp[0] = nums[0];
+            int max = dp[0];
+            for (int i = 1; i < nums.length; i++) {
+                dp[i] = Math.max(dp[i-1] + nums[i], nums[i]);
+                max = Math.max(dp[i],max);
+            }
+            return max;
+        }
+
+        /**
+         * 分治策略
+         * @param nums
+         * @return
+         */
         public int maxSubArray(int[] nums) {
             int left = 0;
             int right = nums.length;
