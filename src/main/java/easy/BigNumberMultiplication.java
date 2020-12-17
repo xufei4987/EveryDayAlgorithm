@@ -5,7 +5,7 @@ package easy;
  */
 public class BigNumberMultiplication {
     public static void main(String[] args) {
-        System.out.println(bigNumMul("1000", "1000"));
+        System.out.println(bigNumMul("123", "456"));
     }
 
     public static String bigNumMul(String num1, String num2){
