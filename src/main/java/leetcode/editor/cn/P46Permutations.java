@@ -46,7 +46,7 @@ public class P46Permutations {
                 if (ints.contains(nums[i])) continue;
                 ints.add(nums[i]);
                 dfs(idx+1,nums,ints,result);
-                ints.remove(Integer.valueOf(nums[i]));
+                ints.remove(ints.size() - 1);
             }
         }
     }
